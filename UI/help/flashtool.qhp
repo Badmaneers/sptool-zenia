@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<QtHelpProject version="1.0">
+  <namespace>com.mediatek.flashtool</namespace>
+  <virtualFolder>doc</virtualFolder>
+  <filterSection>
+     <toc>
+        <section title="FAQ" ref="faqr.htm"/>
+      </toc>
+     <files>
+         <file>images/*.gif</file>
+         <file>images/*.png</file>
+         <file>*.htm</file>         
+     </files>
+   </filterSection>
+ </QtHelpProject>
