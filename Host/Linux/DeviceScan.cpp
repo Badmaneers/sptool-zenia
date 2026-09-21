@@ -275,7 +275,7 @@ bool DeviceScan::GetDeviceInfo(size_t ports_count,
     return false;
 }
 
-bool DeviceScan::FindDeviceUSBPort(size_t ports_count, char *portName, int* p_stop_flag, const int& d_time_out)
+bool DeviceScan::FindDeviceUSBPort(size_t ports_count, char *portName, int* p_stop_flag, const int& d_time_out, const char *preferComPort)
 {
     hotplug_sock_ = init_hotplug_sock();
     if(hotplug_sock_ < 0)
@@ -328,72 +328,7 @@ bool DeviceScan::FindDeviceUSBPort(size_t ports_count, char *portName, int* p_st
         {
             LOGI("uevent: %s\n", buf);
 
-            if(GetDeviceInfo(ports_count, buf, sizeof(buf), portName))
-            {
-                close(hotplug_sock_);
-                hotplug_sock_ = 0;
-                return true;
-            }
-        }
-    }
-    close(hotplug_sock_);
-    hotplug_sock_ = 0;
-    return false;
-}
-
-bool DeviceScan::FindSpecialDeviceUSBPort(size_t ports_count, const char *sPreferComPort, char *portName, int *p_stop_flag, int d_time_out)
-{
-    hotplug_sock_ = init_hotplug_sock();
-    if(hotplug_sock_ < 0)
-    {
-        LOGE("Failed to create hotplug socket\n");
-        return false;
-    }
-
-    struct timeval tv;
-    int ret, recvLen;
-
-    QElapsedTimer time;
-    time.start();
-
-    while(BOOT_STOP != (*p_stop_flag))
-    {
-        char buf[UEVENT_BUFFER_SIZE * 2] = {0};
-
-        fd_set fds;
-        FD_ZERO(&fds);
-        FD_SET(hotplug_sock_, &fds);
-
-        tv.tv_sec = 0;
-        tv.tv_usec = 100 * 1000;
-
-        ret = select(hotplug_sock_ + 1, &fds, NULL, NULL, &tv);
-
-        if (time.elapsed() > d_time_out)
-        {
-            LOGE("Timeout(%u ms) for searching USB port!\n", d_time_out);
-            close(hotplug_sock_);
-            hotplug_sock_ = 0;
-            return false;
-        }
-
-        if(ret < 0)
-        {
-            if(errno == EAGAIN || errno == EWOULDBLOCK)
-                continue;
-            LOGI("select error: %s\n", strerror(errno));
-            continue;
-        }
-
-        if(!FD_ISSET(hotplug_sock_, &fds))
-            continue;
-
-        recvLen = recv(hotplug_sock_, &buf, sizeof(buf), 0);
-
-        if(recvLen > 0)
-        {
-            LOGI("uevent: %s\n", buf);
-            if (!USBPathMatch(buf, sPreferComPort))
+            if(preferComPort && !USBPathMatch(buf, preferComPort))
             {
                 LOGI("skip: %s\n", buf);
                 continue;
@@ -410,4 +345,9 @@ bool DeviceScan::FindSpecialDeviceUSBPort(size_t ports_count, const char *sPrefe
     close(hotplug_sock_);
     hotplug_sock_ = 0;
     return false;
+}
+
+bool DeviceScan::FindSpecialDeviceUSBPort(size_t ports_count, const char *sPreferComPort, char *portName, int *p_stop_flag, int d_time_out)
+{
+    return FindDeviceUSBPort(ports_count, portName, p_stop_flag, d_time_out, sPreferComPort);
 }

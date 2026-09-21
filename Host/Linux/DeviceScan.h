@@ -15,7 +15,7 @@ class DeviceScan
 public:
     explicit DeviceScan(USB_DEVICE_INFO* info);
     ~DeviceScan();
-    bool FindDeviceUSBPort(size_t ports_count, char *portName, int* p_stop_flag, const int& d_time_out);
+    bool FindDeviceUSBPort(size_t ports_count, char *portName, int* p_stop_flag, const int& d_time_out, const char *preferComPort = NULL);
     bool FindSpecialDeviceUSBPort(size_t ports_count, const char *sPreferComPort, char *portName, int* p_stop_flag, int d_time_out);
 
 private:

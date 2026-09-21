@@ -10,11 +10,10 @@ SUBSYSTEM=="tty", ATTRS{idVendor}=="0e8d", MODE="0666", GROUP="plugdev"
 
 # BROM mode
 SUBSYSTEM=="usb", ATTRS{idVendor}=="0e8d", ATTRS{idProduct}=="0003", MODE="0666", GROUP="plugdev"
-SUBSYSTEM=="usb", ATTRS{idVendor}=="0e8d", ATTRS{idProduct}=="0003", RUN+="/bin/chmod 0666 /dev/ttyACM*"
 
 # Download Agent mode
 SUBSYSTEM=="usb", ATTRS{idVendor}=="0e8d", ATTRS{idProduct}=="2000", MODE="0666", GROUP="plugdev"
 SUBSYSTEM=="usb", ATTRS{idVendor}=="0e8d", ATTRS{idProduct}=="2001", MODE="0666", GROUP="plugdev"
 
 # Preloader / BootROM
-SUBSYSTEM=="usb", ATTRS{idVendor}=="0e8d", ATTRS{idProduct}=="0003", RUN+="/bin/sh -c 'sleep 1 && chmod 0666 /dev/ttyACM* 2>/dev/null || true'"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0e8d", ATTRS{idProduct}=="0003", MODE="0666", GROUP="plugdev"

@@ -17,6 +17,7 @@
 #include <cstring>
 #include <cstdlib>
 #include <cstdint>
+#include <unistd.h>
 
 #include <QCoreApplication>
 #include <QDir>
@@ -729,9 +730,14 @@ void FileUtils::runModemManagerCmd()
     if (item.GetBooleanValue()) {
         std::string modemmanager_cmd_file = FileUtils::AbsolutePath("modemmanagercmd.sh");
         if (QFileInfo(QString::fromStdString(modemmanager_cmd_file)).exists()) {
-            system("sudo chmod +x modemmanagercmd.sh");
-            system("sudo ./modemmanagercmd.sh &");
-            LOG("running \"sudo ./modemmanagercmd.sh &\" cmd in background!");
+            std::string chmod_cmd = "sudo chmod +x " + modemmanager_cmd_file;
+            (void)system(chmod_cmd.c_str());
+            if (fork() == 0) {
+                setsid();
+                execl("/usr/bin/sudo", "sudo", modemmanager_cmd_file.c_str(), (char *)NULL);
+                _exit(127);
+            }
+            LOG("running \"%s\" cmd in background!", modemmanager_cmd_file.c_str());
         } else {
             LOG("modemmanagercmd.sh file is NOT exists.");
         }
