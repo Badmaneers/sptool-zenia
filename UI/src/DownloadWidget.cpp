@@ -15,6 +15,7 @@
 #include <QtDebug>
 #include <QFileDialog>
 #include <QSettings>
+#include <QMessageBox>
 #include <algorithm>
 
 const static std::map<int, int>::value_type init_values[] = {
@@ -1644,7 +1645,63 @@ void DownloadWidget::choose_rom_file(int row)
 
 void DownloadWidget::on_comboBox_Scene_activated(int index)
 {
-    scene_ = static_cast<Download_Scene>(ui_->comboBox_Scene->itemData(index).toInt());
+    Download_Scene new_scene = static_cast<Download_Scene>(ui_->comboBox_Scene->itemData(index).toInt());
+
+    if(new_scene == FORMAT_ALL_DOWNLOAD) {
+        QMessageBox msgBox(this);
+        msgBox.setIcon(QMessageBox::Critical);
+        msgBox.setWindowTitle("DANGER: Format All + Download");
+        msgBox.setText(
+            "<h2 style='color:#ff4444;'>WARNING: DESTRUCTIVE OPERATION</h2>"
+            "<p style='font-size:14px;'><b>Format All + Download</b> will:</p>"
+            "<ul>"
+            "<li><b style='color:#ff4444;'>COMPLETELY WIPE</b> your device's eMMC/UFS storage</li>"
+            "<li><b style='color:#ff4444;'>ERASE ALL DATA</b> including firmware, user data, and calibration</li>"
+            "<li><b style='color:#ff4444;'>PERMANENTLY DESTROY</b> your IMEI and baseband calibration data</li>"
+            "<li><b style='color:#ff4444;'>BRICK YOUR DEVICE</b> if not performed correctly</li>"
+            "</ul>"
+            "<p style='font-size:13px; color:#ff4444;'><b>THIS OPERATION IS FOR PROFESSIONALS ONLY!</b></p>"
+            "<p style='font-size:12px;'>Only proceed if you:</p>"
+            "<ul>"
+            "<li>Have a complete firmware backup</li>"
+            "<li>Understand the risks of permanent data loss</li>"
+            "<li>Have experience with low-level device flashing</li>"
+            "</ul>"
+        );
+        msgBox.setInformativeText("Are you absolutely sure you want to continue?");
+        msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+        msgBox.setDefaultButton(QMessageBox::No);
+        msgBox.setButtonText(QMessageBox::Yes, "YES, I UNDERSTAND THE RISKS");
+        msgBox.setButtonText(QMessageBox::No, "CANCEL");
+
+        QAbstractButton* yesButton = msgBox.button(QMessageBox::Yes);
+        yesButton->setStyleSheet(
+            "QPushButton { background-color: #cc0000; color: white; font-weight: bold; padding: 8px 16px; }"
+            "QPushButton:hover { background-color: #ff0000; }"
+        );
+
+        QAbstractButton* noButton = msgBox.button(QMessageBox::No);
+        noButton->setStyleSheet(
+            "QPushButton { background-color: #2d7d2d; color: white; font-weight: bold; padding: 8px 16px; }"
+            "QPushButton:hover { background-color: #3a9e3a; }"
+        );
+
+        int ret = msgBox.exec();
+        if(ret != QMessageBox::Yes) {
+            // Revert combo box to previous selection
+            ui_->comboBox_Scene->blockSignals(true);
+            for(int i = 0; i < ui_->comboBox_Scene->count(); i++) {
+                if(ui_->comboBox_Scene->itemData(i).toInt() == scene_) {
+                    ui_->comboBox_Scene->setCurrentIndex(i);
+                    break;
+                }
+            }
+            ui_->comboBox_Scene->blockSignals(false);
+            return;
+        }
+    }
+
+    scene_ = new_scene;
 
     UpdateRomInfoList(scene_);
 }
