@@ -1,6 +1,15 @@
-# SP Flash Tool for Linux
+# SP Flash Tool for Linux v5.3-zenia
 
 A Qt6-based flashing tool for MediaTek Android devices. Supports BROM mode, Download Agent mode, format, readback, memory test, firmware upgrade, and more.
+
+## What's New in 5.3-zenia
+
+- Qt6 Linux port with dark mode and modern UI
+- BROM mode fix for Linux kernel 5.4+ (LD_PRELOAD shim)
+- UART as default connection type
+- Native file dialogs
+- Dark/Light theme toggle
+- GitHub Actions CI/CD workflow
 
 ## Requirements
 
@@ -12,8 +21,8 @@ A Qt6-based flashing tool for MediaTek Android devices. Supports BROM mode, Down
 1. Extract the release archive:
 
 ```bash
-unzip flash_tool_linux_<date>.zip
-cd flash_tool_linux_<date>
+unzip flash_tool_linux_5.3-zenia.zip
+cd flash_tool_linux_5.3-zenia
 ```
 
 2. Install udev rules so the tool can access USB devices without root:
@@ -67,10 +76,14 @@ For BROM mode (preloader/bootrom), the tool automatically detects the device whe
 | Dark theme looks wrong | Go to Options > Appearance and select your preferred theme. |
 | Tool doesn't start | Run `./flash_tool` from terminal and check error output. |
 
+## Supported Platforms
+
+MT6573, MT6575, MT6577, MT6589, MT6572, MT6582, MT8135, MT6592, MT6571, MT8127, MT6595, MT6752, MT2601, MT8173, MT6795, MT6735, MT6753, MT8163, MT8590, MT6580, MT7623, MT7683
+
 ## File Structure
 
 ```
-flash_tool_linux_<date>/
+flash_tool_linux_5.3-zenia/
 ├── flash_tool              # Main binary
 ├── flash_tool.sh           # Launcher script (recommended)
 ├── 99-ttyacms.rules        # udev rules for USB device access

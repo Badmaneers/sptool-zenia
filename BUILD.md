@@ -1,4 +1,4 @@
-# Building SP Flash Tool from Source
+# Building SP Flash Tool v5.3-zenia from Source
 
 ## Prerequisites
 
@@ -64,6 +64,13 @@ Output: `dist/flash_tool_linux_<date>.zip`
 |----------|---------|-------------|
 | `BUILD_DIR` | `./build` | Out-of-tree build directory |
 | `JOBS` | `$(nproc)` | Number of parallel make jobs |
+
+## CI/CD
+
+The project includes a GitHub Actions workflow (`.github/workflows/build.yml`) that:
+- Builds on every push to `main` and on pull requests
+- Creates a GitHub release when a `v*` tag is pushed
+- Supports manual triggering with a release toggle via `workflow_dispatch`
 
 ## Manual Build Steps
 
