@@ -1,0 +1,137 @@
+name: Build & Release
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+
+env:
+  BUILD_DIR: build
+  DIST_NAME: flash_tool_linux
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential g++ \
+            qt6-base-dev qt6-5compat-dev qt6-tools-dev \
+            libgl-dev libx11-dev \
+            libxerces-c-dev \
+            patchelf zip
+
+      - name: Verify toolchain
+        run: |
+          qmake6 --version
+          g++ --version | head -1
+          echo "Qt6 libraries: $(qmake6 -query QT_INSTALL_LIBS)"
+
+      - name: Build
+        run: ./build.sh "${{ env.DIST_NAME }}_${{ github.run_number }}"
+        env:
+          JOBS: 4
+
+      - name: Verify binary
+        run: |
+          DIST_DIR=$(ls -d dist/${{ env.DIST_NAME }}_* | head -1)
+          echo "=== Binary info ==="
+          file "$DIST_DIR/flash_tool"
+          echo ""
+          echo "=== Shared library deps ==="
+          LD_LIBRARY_PATH="$DIST_DIR/lib" ldd "$DIST_DIR/flash_tool" | grep -c "not found" || true
+          echo ""
+          echo "=== Package contents ==="
+          ls -lh "$DIST_DIR/" | head -20
+          echo ""
+          echo "=== lib/ contents ==="
+          ls "$DIST_DIR/lib/" | wc -l
+          echo " files in lib/"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.DIST_NAME }}_linux
+          path: dist/${{ env.DIST_NAME }}_*/
+          if-no-files-found: error
+          retention-days: 30
+
+  release:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.DIST_NAME }}_linux
+          path: artifact/
+
+      - name: Package release
+        run: |
+          cd artifact
+          ROOT_DIR=$(ls -d */ | head -1)
+          ZIP_NAME="${{ env.DIST_NAME }}_${GITHUB_REF_NAME}.zip"
+          zip -r -q "../$ZIP_NAME" "$ROOT_DIR"
+          echo "RELEASE_ZIP=$ZIP_NAME" >> "$GITHUB_ENV"
+          echo "=== Release package ==="
+          ls -lh "../$ZIP_NAME"
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          # Get commits since last tag
+          PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+          if [ -n "$PREV_TAG" ]; then
+            LOG=$(git log --pretty=format:"- %s (%h)" "$PREV_TAG"..HEAD --no-merges)
+          else
+            LOG=$(git log --pretty=format:"- %s (%h)" --no-merges -20)
+          fi
+
+          # Write to file for release body
+          cat > release_notes.md << 'HEADER'
+          ## What's Changed
+          HEADER
+          echo "$LOG" >> release_notes.md
+
+          echo "" >> release_notes.md
+          echo "## Installation" >> release_notes.md
+          echo '```bash' >> release_notes.md
+          echo "unzip ${{ env.DIST_NAME }}_${GITHUB_REF_NAME}.zip" >> release_notes.md
+          echo "cd ${{ env.DIST_NAME }}_${GITHUB_REF_NAME}" >> release_notes.md
+          echo "sudo cp 99-ttyacms.rules /etc/udev/rules.d/" >> release_notes.md
+          echo "sudo udevadm control --reload-rules" >> release_notes.md
+          echo "./flash_tool.sh" >> release_notes.md
+          echo '```' >> release_notes.md
+
+          echo "" >> release_notes.md
+          echo "## System Requirements" >> release_notes.md
+          echo "- Linux x86_64, kernel 5.4+" >> release_notes.md
+          echo "- No system Qt installation required (all libraries bundled)" >> release_notes.md
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "SP Flash Tool ${{ github.ref_name }}"
+          body_path: release_notes.md
+          draft: false
+          prerelease: ${{ contains(github.ref_name, '-rc') || contains(github.ref_name, '-beta') || contains(github.ref_name, '-alpha') }}
+          files: ${{ env.RELEASE_ZIP }}
+          generate_release_notes: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
