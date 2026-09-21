@@ -73,10 +73,7 @@ int ioctl(int fd, unsigned long request, ...)
             errno = 0;
             return 0;
         default:
-            fprintf(stderr, "[patch_brom] ioctl 0x%lx EOPNOTSUPP -> faked OK\n",
-                    request);
-            errno = 0;
-            return 0;
+            break;
         }
     }
 

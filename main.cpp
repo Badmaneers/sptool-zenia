@@ -56,6 +56,7 @@ static void ensure_brom_shim(char *argv[])
     }
     setenv("LD_PRELOAD", preload.c_str(), 1);
     execv(exe, argv);
+    _exit(127);
 }
 #endif
 
