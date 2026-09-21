@@ -38,11 +38,11 @@ static const unsigned int  BUILD_NUM        = 00;
 static const unsigned int  BUILD_SN         = 000;
 //Note: REVISION_NUM is commit hash of the tool, should be HEX(0x...)
 static const unsigned int  REVISION_NUM     = 0x596975;
-static const char* const   BUILD_DATE       = "2022/07/03 18:00";
-static const char* const   COMMENTS         = "N/A";
+static const char* const   BUILD_DATE       = "2026/09/21";
+static const char* const   COMMENTS         = "Qt6 Linux port with dark mode, BROM shim, and modern UI";
 
-static const char* const   APP_NAME         = "MediaTek SP Flash Tool";
-static const char* const   PROC_NAME        = "flash_tool.exe";
+static const char* const   APP_NAME         = "SP Flash Tool for Linux";
+static const char* const   PROC_NAME        = "flash_tool";
 
 //*****************************************************************
 

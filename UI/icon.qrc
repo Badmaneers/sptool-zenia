@@ -205,6 +205,7 @@
         <file>images/dramrepair.png</file>
         <file>images/checkbox_checked.svg</file>
         <file>images/radio_checked.svg</file>
+        <file>images/github.svg</file>
         <file>style.qss</file>
         <file>style-dark.qss</file>
     </qresource>

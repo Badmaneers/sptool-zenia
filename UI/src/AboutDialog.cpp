@@ -7,6 +7,8 @@
 #include "../../Utility/version.h"
 #include "../../Host/Inc/RuntimeMemory.h"
 
+#include <QSysInfo>
+
 const QString AboutDialog::S_BUILD("Build: ");
 const QString AboutDialog::S_COMMENT("Comment:");
 const QString AboutDialog::S_BUILD_DATE("Build-Date: ");
@@ -18,8 +20,6 @@ AboutDialog::AboutDialog(MainWindow *parent) :
     ui(new Ui::AboutDialog)
 {
     ui->setupUi(this);
-
-  // this->setStyleSheet("background-image:url(:/images/background.jpg);");
 
     this->setWindowFlags(this->windowFlags() & ~Qt::WindowContextHelpButtonHint);
 
@@ -40,6 +40,7 @@ void AboutDialog::UpdateVersionInfo()
 {
     //tool version info
     ui->label_title->setText(ToolInfo::ToolName().c_str());
+    ui->label_version->setText(QString("Version %1").arg(ToolInfo::VersionNum().c_str()));
 
     if(ToolInfo::IsCustomerVer())
         ui->label_comment->setText(LoadQString(main_window->GetLanguageTag(), IDS_STRING_CUSTOM_RELEASE) + ToolInfo::Comments().c_str());
