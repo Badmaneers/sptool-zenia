@@ -45,8 +45,8 @@ int ioctl(int fd, unsigned long request, ...)
     arg = va_arg(args, void *);
     va_end(args);
 
-    if (!real_ioctl)
-        real_ioctl = dlsym(RTLD_NEXT, "ioctl");
+    if (!__atomic_load_n(&real_ioctl, __ATOMIC_ACQUIRE))
+        __atomic_store_n(&real_ioctl, dlsym(RTLD_NEXT, "ioctl"), __ATOMIC_RELEASE);
 
     ret = real_ioctl(fd, request, arg);
     saved_errno = errno;

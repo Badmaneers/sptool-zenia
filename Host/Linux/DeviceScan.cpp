@@ -108,7 +108,7 @@ bool DeviceScan::WaitForDeviceReady(const char *path)
 
     for (int i = 0; i < 100; ++i)
     {
-        if ((fd = open(path, O_RDWR | O_NONBLOCK | O_NOCTTY, 0)) > 0)
+        if ((fd = open(path, O_RDWR | O_NONBLOCK | O_NOCTTY, 0)) >= 0)
         {
             LOGI("<%s>: ready (attempt %d)\n", path, i);
             close(fd);
@@ -118,7 +118,7 @@ bool DeviceScan::WaitForDeviceReady(const char *path)
                 LOGI("chown failed: %s\n", strerror(errno));
             }
 
-            if (-1 == chmod(path, S_IRUSR | S_IWUSR | S_IXUSR | S_IRGRP | S_IWGRP | S_IXGRP | S_IROTH | S_IWOTH | S_IXOTH))
+            if (-1 == chmod(path, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP))
             {
                 LOGI("chmod failed: %s\n", strerror(errno));
             }
@@ -191,17 +191,17 @@ bool DeviceScan::GetDeviceInfo(size_t ports_count,
 
     memcpy(path_without_sys_prefix, firstPosition + prefixLen, length);
 
-    char *lastToken = rindex(path_without_sys_prefix, '/');
+    char *lastToken = strrchr(path_without_sys_prefix, '/');
     if(!lastToken || strlen(lastToken) <= 1)
         return false;
 
     int len = strlen(lastToken);
     memcpy(path_without_sys_prefix_up_dir, path_without_sys_prefix, length - len);
 
-    sprintf(path_with_sys_prefix, "%s%s", sysPrefix, path_without_sys_prefix_up_dir);
+    snprintf(path_with_sys_prefix, sizeof(path_with_sys_prefix), "%s%s", sysPrefix, path_without_sys_prefix_up_dir);
 
-    sprintf(path_of_vid, "%s/%s", path_with_sys_prefix, VID);
-    sprintf(path_of_pid, "%s/%s", path_with_sys_prefix, PID);
+    snprintf(path_of_vid, sizeof(path_of_vid), "%s/%s", path_with_sys_prefix, VID);
+    snprintf(path_of_pid, sizeof(path_of_pid), "%s/%s", path_with_sys_prefix, PID);
 
     LOGI("sysfs vid path: %s\n", path_of_vid);
     LOGI("sysfs pid path: %s\n", path_of_pid);
@@ -214,9 +214,14 @@ bool DeviceScan::GetDeviceInfo(size_t ports_count,
         LOGI("open VID device failed: %s\n", strerror(errno));
         return false;
     }
-    size_t readSize = read(fd, tmpbuf, sizeof(tmpbuf) - 1);
-    Q_UNUSED(readSize);
+    memset(tmpbuf, 0, sizeof(tmpbuf));
+    ssize_t readSize = read(fd, tmpbuf, sizeof(tmpbuf) - 1);
     close(fd);
+    if (readSize <= 0)
+    {
+        LOGI("read VID failed\n");
+        return false;
+    }
 
     newdev.vid = strtol(tmpbuf, NULL, 16);
     LOGI("device vid = %04x\n", newdev.vid);
@@ -227,24 +232,29 @@ bool DeviceScan::GetDeviceInfo(size_t ports_count,
         LOGI("open PID device failed: %s\n", strerror(errno));
         return false;
     }
+    memset(tmpbuf, 0, sizeof(tmpbuf));
     readSize = read(fd, tmpbuf, sizeof(tmpbuf) - 1);
-    Q_UNUSED(readSize);
     close(fd);
+    if (readSize <= 0)
+    {
+        LOGI("read PID failed\n");
+        return false;
+    }
 
     newdev.pid = strtol(tmpbuf, NULL, 16);
     LOGI("device pid = %04x\n", newdev.pid);
 
     char portNameTmp[UEVENT_BUFFER_SIZE] = {0};
-    char *lastSlash = rindex(lastPosition, '/');
+    char *lastSlash = strrchr(lastPosition, '/');
     if(lastSlash && strlen(lastSlash) > 1)
     {
-        memcpy(portNameTmp, lastSlash, strlen(lastSlash));
+        snprintf(portNameTmp, sizeof(portNameTmp), "%s", lastSlash);
     }
     else
     {
-        strcpy(portNameTmp, lastPosition);
+        snprintf(portNameTmp, sizeof(portNameTmp), "%s", lastPosition);
     }
-    sprintf(portName, "/dev%s", portNameTmp);
+    snprintf(portName, UEVENT_BUFFER_SIZE + 5, "/dev%s", portNameTmp);
     LOGI("com portName is: %s\n", portName);
 
     if(VerifyDeviceInfo(ports_count, &newdev))
