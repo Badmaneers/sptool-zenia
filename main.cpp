@@ -20,6 +20,45 @@
 
 #include "TimeStamp/TempPlcCtrl.h"
 
+#ifdef _LINUX
+#include <unistd.h>
+#include <climits>
+#include <cstdlib>
+#include <cstring>
+#include <sys/stat.h>
+
+static bool shim_loaded()
+{
+    const char *p = getenv("LD_PRELOAD");
+    return p && strstr(p, "libpatch_brom.so");
+}
+
+static void ensure_brom_shim(char *argv[])
+{
+    if (shim_loaded())
+        return;
+
+    char exe[PATH_MAX];
+    ssize_t len = readlink("/proc/self/exe", exe, sizeof(exe) - 1);
+    if (len <= 0) return;
+    exe[len] = '\0';
+
+    std::string dir = std::string(exe).substr(0, std::string(exe).rfind('/'));
+    std::string shim = dir + "/lib/libpatch_brom.so";
+
+    struct stat st;
+    if (stat(shim.c_str(), &st) != 0) return;
+
+    std::string preload = shim;
+    const char *old = getenv("LD_PRELOAD");
+    if (old && old[0]) {
+        preload = std::string(old) + ":" + shim;
+    }
+    setenv("LD_PRELOAD", preload.c_str(), 1);
+    execv(exe, argv);
+}
+#endif
+
 static void init_app_path(char* argv[])
 {
     QDir dir = QFileInfo(argv[0]).absoluteDir();
@@ -101,6 +140,7 @@ int main(int argc, char *argv[])
     try
     {
 #ifdef _LINUX
+        ensure_brom_shim(argv);
         QCoreApplication::addLibraryPath(QDir::toNativeSeparators("./lib"));
 #endif
         EnableMemLeakCheck();

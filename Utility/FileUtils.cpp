@@ -633,6 +633,13 @@ void FileUtils::copy_99ttyacms_file(bool need_check_first_run/* = false*/)
     // linux modemmanager issue fixed: copy 99-ttyacms.rules file to /etc/udev/rules.d directory.
     if (QFile::copy(src_file, dest_file)) {
         LOG("copy 99-ttyacms.rules file successfully!");
+        // Reload udev rules so they take effect immediately
+        int ret = system("udevadm control --reload-rules 2>/dev/null && udevadm trigger 2>/dev/null");
+        if (ret == 0) {
+            LOG("udev rules reloaded successfully!");
+        } else {
+            LOG("udev rules reload failed (non-fatal): %s", strerror(errno));
+        }
     } else {
         LOG("copy 99-ttyacms.rules file failed, reason: %s", strerror(errno));
     }

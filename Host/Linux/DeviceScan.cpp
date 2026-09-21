@@ -31,7 +31,8 @@ DeviceScan::~DeviceScan()
 
 int DeviceScan::init_hotplug_sock()
 {
-    const int bufferSize = 2048;
+    const int bufferSize = 16 * 1024 * 1024;
+    struct timeval timeout = {1, 0};
 
     struct sockaddr_nl snl;
     bzero(&snl, sizeof(struct sockaddr_nl));
@@ -43,25 +44,31 @@ int DeviceScan::init_hotplug_sock()
 
     if(s == -1)
     {
-        LOGI("create socket error.\n");
-
+        LOGI("create socket error: %s\n", strerror(errno));
         return -1;
     }
 
-    int tmp = 1;
-
-    int ret = setsockopt(s, SOL_SOCKET, SO_RCVBUF, &bufferSize, sizeof(bufferSize));
+    int ret = setsockopt(s, SOL_SOCKET, SO_RCVBUFFORCE, &bufferSize, sizeof(bufferSize));
     if (ret == -1)
     {
-        LOGI("set socket receive buffer failed!\n");
+        LOGI("set socket receive buffer failed: %s\n", strerror(errno));
         close(s);
         return -1;
     }
 
+    ret = setsockopt(s, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(struct timeval));
+    if (ret == -1)
+    {
+        LOGI("set socket receive timeout failed: %s\n", strerror(errno));
+        close(s);
+        return -1;
+    }
+
+    int tmp = 1;
     ret = setsockopt(s, SOL_SOCKET, SO_REUSEADDR, &tmp, sizeof(int));
     if (ret == -1)
     {
-        LOGI("set socket reuse addr option fail!\n");
+        LOGI("set socket reuse addr option fail: %s\n", strerror(errno));
         close(s);
         return -1;
     }
@@ -70,7 +77,7 @@ int DeviceScan::init_hotplug_sock()
 
     if(ret < 0)
     {
-        LOGI("bind socket error.\n");
+        LOGI("bind socket error: %s\n", strerror(errno));
         close(s);
         return -1;
     }
@@ -95,51 +102,40 @@ bool DeviceScan::VerifyDeviceInfo(size_t ports_count, const USB_DEVICE_INFO *ins
 
 bool DeviceScan::WaitForDeviceReady(const char *path)
 {
-#if 1
-    //int fd = -1;
+    int fd = -1;
 
-    // UEVENT is earlier than create tty node
-    // so sleep some time...
-    LOGI("<%s>: waiting...\n", path);
+    LOGI("<%s>: waiting for device ready...\n", path);
 
-    if(-1 == chown(path, 0, 0))
+    for (int i = 0; i < 100; ++i)
     {
-        LOGI("change owner as root: <%s>: failed %d, %s~\n", path, errno, strerror(errno));
-    }
-
-    if(-1 == chmod(path, S_IRUSR | S_IWUSR | S_IXUSR | S_IRGRP | S_IWGRP | S_IXGRP | S_IROTH | S_IWOTH | S_IXOTH))
-    {
-        LOGI("change owner as root: <%s>: failed %d, %s~\n", path, errno, strerror(errno));
-    }
-#if 0
-    for (int i=0; i<10000; ++i)
-    {
-        if ((fd=open(path, O_RDWR|O_NONBLOCK|O_NOCTTY, 0)) > 0)
+        if ((fd = open(path, O_RDWR | O_NONBLOCK | O_NOCTTY, 0)) > 0)
         {
-            LOGI("round:%d <%s>: ready~\n", i, path);
+            LOGI("<%s>: ready (attempt %d)\n", path, i);
             close(fd);
-            sleep(1);
 
+            if (-1 == chown(path, 0, 0))
+            {
+                LOGI("chown failed: %s\n", strerror(errno));
+            }
+
+            if (-1 == chmod(path, S_IRUSR | S_IWUSR | S_IXUSR | S_IRGRP | S_IWGRP | S_IXGRP | S_IROTH | S_IWOTH | S_IXOTH))
+            {
+                LOGI("chmod failed: %s\n", strerror(errno));
+            }
+
+            usleep(100000);
             end_time_ = time(NULL);
-           return true;
+            return true;
         }
         else
         {
-            LOGI("[%d]open %s failed: %d, %s\n",
-                i, path, errno, strerror(errno));
+            LOGI("[%d] open %s failed: %s\n", i, path, strerror(errno));
         }
-        usleep(10);
+        usleep(100000);
     }
 
-#endif
-
-    LOGI("<%s>: not ready!\n", path);
-
+    LOGI("<%s>: not ready after 100 attempts!\n", path);
     return false;
-#else
-    usleep(500000);
-    return true;
-#endif
 }
 
 bool DeviceScan::USBPathMatch(const char *buf, const char *preferComPort) const
@@ -158,13 +154,13 @@ bool DeviceScan::GetDeviceInfo(size_t ports_count,
         char *portName)
 {
     const char *prefix = "add@";
-    const char *temp1 = "/tty/ttyACM";
-    const char *sysPrefix ="/sys";
-    const char *PID ="idProduct";
-    const char *VID ="idVendor";
+    const char *ttyACM = "/ttyACM";
+    const char *sysPrefix = "/sys";
+    const char *PID = "idProduct";
+    const char *VID = "idVendor";
     const char *removePrefix = "remove@";
 
-    char mybuf[UEVENT_BUFFER_SIZE * 2]={0};
+    char mybuf[UEVENT_BUFFER_SIZE * 2] = {0};
 
     char *firstPosition;
     char *lastPosition;
@@ -173,88 +169,110 @@ bool DeviceScan::GetDeviceInfo(size_t ports_count,
 
     memcpy(mybuf, buf, buf_size);
 
-    firstPosition = strstr(mybuf,prefix);
-    lastPosition = strstr(mybuf, temp1);
+    firstPosition = strstr(mybuf, prefix);
+    lastPosition = strstr(mybuf, ttyACM);
     if(!firstPosition)
         firstPosition = strstr(mybuf, removePrefix);
 
+    if(!firstPosition || !lastPosition)
+        return false;
 
     int prefixLen = strlen(prefix);
     int length = lastPosition - firstPosition - prefixLen;
-    char path_without_sys_prefix [UEVENT_BUFFER_SIZE]={0};
-    char path_without_sys_prefix_up_dir[UEVENT_BUFFER_SIZE]={0};
-    char path_with_sys_prefix[UEVENT_BUFFER_SIZE]={0};
-    char path_of_pid[UEVENT_BUFFER_SIZE]={0};
-    char path_of_vid[UEVENT_BUFFER_SIZE]={0};
 
-    if(firstPosition && lastPosition)
+    if(length <= 0 || length >= UEVENT_BUFFER_SIZE)
+        return false;
+
+    char path_without_sys_prefix[UEVENT_BUFFER_SIZE] = {0};
+    char path_without_sys_prefix_up_dir[UEVENT_BUFFER_SIZE] = {0};
+    char path_with_sys_prefix[UEVENT_BUFFER_SIZE] = {0};
+    char path_of_pid[UEVENT_BUFFER_SIZE] = {0};
+    char path_of_vid[UEVENT_BUFFER_SIZE] = {0};
+
+    memcpy(path_without_sys_prefix, firstPosition + prefixLen, length);
+
+    char *lastToken = rindex(path_without_sys_prefix, '/');
+    if(!lastToken || strlen(lastToken) <= 1)
+        return false;
+
+    int len = strlen(lastToken);
+    memcpy(path_without_sys_prefix_up_dir, path_without_sys_prefix, length - len);
+
+    sprintf(path_with_sys_prefix, "%s%s", sysPrefix, path_without_sys_prefix_up_dir);
+
+    sprintf(path_of_vid, "%s/%s", path_with_sys_prefix, VID);
+    sprintf(path_of_pid, "%s/%s", path_with_sys_prefix, PID);
+
+    LOGI("sysfs vid path: %s\n", path_of_vid);
+    LOGI("sysfs pid path: %s\n", path_of_pid);
+
+    char tmpbuf[5] = {0};
+
+    int fd = open(path_of_vid, O_RDONLY);
+    if (fd < 0)
     {
-        memcpy(path_without_sys_prefix,firstPosition+prefixLen,length);
+        LOGI("open VID device failed: %s\n", strerror(errno));
+        return false;
+    }
+    size_t readSize = read(fd, tmpbuf, sizeof(tmpbuf) - 1);
+    Q_UNUSED(readSize);
+    close(fd);
 
-        char* lastToken=rindex(path_without_sys_prefix,'/');
-        int len = strlen(lastToken);
+    newdev.vid = strtol(tmpbuf, NULL, 16);
+    LOGI("device vid = %04x\n", newdev.vid);
 
-        memcpy(path_without_sys_prefix_up_dir,path_without_sys_prefix,length-len);
+    fd = open(path_of_pid, O_RDONLY);
+    if (fd < 0)
+    {
+        LOGI("open PID device failed: %s\n", strerror(errno));
+        return false;
+    }
+    readSize = read(fd, tmpbuf, sizeof(tmpbuf) - 1);
+    Q_UNUSED(readSize);
+    close(fd);
 
-        sprintf(path_with_sys_prefix,"%s%s",sysPrefix,path_without_sys_prefix_up_dir);
+    newdev.pid = strtol(tmpbuf, NULL, 16);
+    LOGI("device pid = %04x\n", newdev.pid);
 
-        sprintf(path_of_vid,"%s/%s",path_with_sys_prefix,VID);
-        sprintf(path_of_pid,"%s/%s",path_with_sys_prefix,PID);
+    char portNameTmp[UEVENT_BUFFER_SIZE] = {0};
+    char *lastSlash = rindex(lastPosition, '/');
+    if(lastSlash && strlen(lastSlash) > 1)
+    {
+        memcpy(portNameTmp, lastSlash, strlen(lastSlash));
+    }
+    else
+    {
+        strcpy(portNameTmp, lastPosition);
+    }
+    sprintf(portName, "/dev%s", portNameTmp);
+    LOGI("com portName is: %s\n", portName);
 
-        //read file
-        char tmpbuf[5] = {0};
-
-        int fd = open(path_of_vid,O_RDONLY);
-        if (fd < 0)
+    if(VerifyDeviceInfo(ports_count, &newdev))
+    {
+        if(WaitForDeviceReady(portName))
         {
-            LOGI("open VID device failed!\n");
-            return false;
-        }
-        size_t readSize = read(fd,tmpbuf,sizeof(tmpbuf)-1);
-        Q_UNUSED(readSize);
-        close(fd);
-
-        LOGI("vid is %s\n",tmpbuf);
-
-        LOGI("device vid = %04x\n", strtol(tmpbuf, NULL, 16));
-
-        newdev.vid = strtol(tmpbuf, NULL, 16);
-
-        fd = open(path_of_pid,O_RDONLY);
-        if (fd < 0)
-        {
-            LOGI("open PID device failed!\n");
-            return false;
-        }
-        readSize = read(fd,tmpbuf,sizeof(tmpbuf)-1);
-        Q_UNUSED(readSize);
-        close(fd);
-
-        LOGI("pid is %s\n", tmpbuf);
-
-        newdev.pid = strtol(tmpbuf, NULL, 16);
-
-        LOGI("device pid = %04x\n", strtol(tmpbuf, NULL, 16));
-
-        char portNameTmp[UEVENT_BUFFER_SIZE]={0};
-        memcpy(portNameTmp,rindex(lastPosition,'/'),strlen(lastPosition));
-        sprintf(portName,"/dev%s",portNameTmp);
-        LOGI("com portName is: %s\n",portName);
-
-        if(VerifyDeviceInfo(ports_count, &newdev))// && WaitForDeviceReady(portName))
-        {
-            double  totalT = difftime(end_time_, start_time_);
-            LOGI("Total wait time = %f", totalT);
+            double totalT = difftime(end_time_, start_time_);
+            LOGI("Total wait time = %f\n", totalT);
             return true;
+        }
+        else
+        {
+            LOGI("Device %04x:%04x found but not ready at %s\n",
+                 newdev.vid, newdev.pid, portName);
         }
     }
 
     return false;
 }
 
-bool DeviceScan::FindDeviceUSBPort(size_t ports_count, char *portName, int* p_stop_flag,const int& d_time_out)
+bool DeviceScan::FindDeviceUSBPort(size_t ports_count, char *portName, int* p_stop_flag, const int& d_time_out)
 {
     hotplug_sock_ = init_hotplug_sock();
+    if(hotplug_sock_ < 0)
+    {
+        LOGE("Failed to create hotplug socket\n");
+        return false;
+    }
 
     struct timeval tv;
     int ret, recvLen;
@@ -275,16 +293,21 @@ bool DeviceScan::FindDeviceUSBPort(size_t ports_count, char *portName, int* p_st
 
         ret = select(hotplug_sock_ + 1, &fds, NULL, NULL, &tv);
 
-        if (time.elapsed() > d_time_out )
+        if (time.elapsed() > d_time_out)
         {
-            LOGE("Timeout(%u ms) for searching USB port!",
-                 d_time_out);
-
+            LOGE("Timeout(%u ms) for searching USB port!\n", d_time_out);
+            close(hotplug_sock_);
+            hotplug_sock_ = 0;
             return false;
         }
 
         if(ret < 0)
+        {
+            if(errno == EAGAIN || errno == EWOULDBLOCK)
+                continue;
+            LOGI("select error: %s\n", strerror(errno));
             continue;
+        }
 
         if(!FD_ISSET(hotplug_sock_, &fds))
             continue;
@@ -293,21 +316,29 @@ bool DeviceScan::FindDeviceUSBPort(size_t ports_count, char *portName, int* p_st
 
         if(recvLen > 0)
         {
-            LOGI("%s\n", buf);
+            LOGI("uevent: %s\n", buf);
 
             if(GetDeviceInfo(ports_count, buf, sizeof(buf), portName))
             {
                 close(hotplug_sock_);
+                hotplug_sock_ = 0;
                 return true;
             }
         }
     }
+    close(hotplug_sock_);
+    hotplug_sock_ = 0;
     return false;
 }
 
 bool DeviceScan::FindSpecialDeviceUSBPort(size_t ports_count, const char *sPreferComPort, char *portName, int *p_stop_flag, int d_time_out)
 {
     hotplug_sock_ = init_hotplug_sock();
+    if(hotplug_sock_ < 0)
+    {
+        LOGE("Failed to create hotplug socket\n");
+        return false;
+    }
 
     struct timeval tv;
     int ret, recvLen;
@@ -328,16 +359,21 @@ bool DeviceScan::FindSpecialDeviceUSBPort(size_t ports_count, const char *sPrefe
 
         ret = select(hotplug_sock_ + 1, &fds, NULL, NULL, &tv);
 
-        if (time.elapsed() > d_time_out )
+        if (time.elapsed() > d_time_out)
         {
-            LOGE("Timeout(%u ms) for searching USB port!",
-                 d_time_out);
-
+            LOGE("Timeout(%u ms) for searching USB port!\n", d_time_out);
+            close(hotplug_sock_);
+            hotplug_sock_ = 0;
             return false;
         }
 
         if(ret < 0)
+        {
+            if(errno == EAGAIN || errno == EWOULDBLOCK)
+                continue;
+            LOGI("select error: %s\n", strerror(errno));
             continue;
+        }
 
         if(!FD_ISSET(hotplug_sock_, &fds))
             continue;
@@ -346,7 +382,7 @@ bool DeviceScan::FindSpecialDeviceUSBPort(size_t ports_count, const char *sPrefe
 
         if(recvLen > 0)
         {
-            LOGI("%s\n", buf);
+            LOGI("uevent: %s\n", buf);
             if (!USBPathMatch(buf, sPreferComPort))
             {
                 LOGI("skip: %s\n", buf);
@@ -356,9 +392,12 @@ bool DeviceScan::FindSpecialDeviceUSBPort(size_t ports_count, const char *sPrefe
             if(GetDeviceInfo(ports_count, buf, sizeof(buf), portName))
             {
                 close(hotplug_sock_);
+                hotplug_sock_ = 0;
                 return true;
             }
         }
     }
+    close(hotplug_sock_);
+    hotplug_sock_ = 0;
     return false;
 }

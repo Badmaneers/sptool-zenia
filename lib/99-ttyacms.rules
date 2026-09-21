@@ -1,1 +1,20 @@
+# MediaTek USB device rules for SP Flash Tool
+# Handles BROM mode (0e8d:0003), Download Agent (0e8d:2000/2001),
+# and preloader (0e8d:0003) modes.
+
+# Ignore for ModemManager
 ATTRS{idVendor}=="0e8d", ENV{ID_MM_DEVICE_IGNORE}="1"
+
+# Set permissions for all MediaTek USB serial devices
+SUBSYSTEM=="tty", ATTRS{idVendor}=="0e8d", MODE="0666", GROUP="plugdev"
+
+# BROM mode
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0e8d", ATTRS{idProduct}=="0003", MODE="0666", GROUP="plugdev"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0e8d", ATTRS{idProduct}=="0003", RUN+="/bin/chmod 0666 /dev/ttyACM*"
+
+# Download Agent mode
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0e8d", ATTRS{idProduct}=="2000", MODE="0666", GROUP="plugdev"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0e8d", ATTRS{idProduct}=="2001", MODE="0666", GROUP="plugdev"
+
+# Preloader / BootROM
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0e8d", ATTRS{idProduct}=="0003", RUN+="/bin/sh -c 'sleep 1 && chmod 0666 /dev/ttyACM* 2>/dev/null || true'"

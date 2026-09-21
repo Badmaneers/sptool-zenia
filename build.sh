@@ -104,6 +104,14 @@ build() {
     fi
 
     echo "== build OK =="
+
+    # --- build shim for BROM on kernel >= 5.4 --------------------------
+    echo "== building patch_brom shim =="
+    gcc -shared -fPIC -o "$BUILD_DIR/libpatch_brom.so" \
+        "$SRC_DIR/lib/patch_brom.c" -ldl
+    if [ ! -f "$BUILD_DIR/libpatch_brom.so" ]; then
+        echo "warning: libpatch_brom.so build failed" >&2
+    fi
 }
 
 if [ "$DO_CLEAN" = "1" ]; then
@@ -142,6 +150,9 @@ cp "$SRC_DIR"/lib/libflashtool.so* "$STAGE/lib/" 2>/dev/null || true
 cp "$SRC_DIR"/lib/libflashtool.v1.so* "$STAGE/lib/" 2>/dev/null || true
 cp "$SRC_DIR"/lib/libflashtoolEx.so* "$STAGE/lib/" 2>/dev/null || true
 cp "$SRC_DIR"/lib/libsla_challenge.so* "$STAGE/lib/" 2>/dev/null || true
+
+# --- LD_PRELOAD shim for BROM on kernel >= 5.4 --------------------------
+[ -f "$BUILD_DIR/libpatch_brom.so" ] && cp "$BUILD_DIR/libpatch_brom.so" "$STAGE/lib/"
 
 # --- data files (mirrors the original deployment set) ---------------------
 for pat in '*.xml' '*.xsd' '*.ini' '*.bin' '*.json' '*.rules' '*.qhc' '*.qch' '*.sh' '*.conf'; do
