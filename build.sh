@@ -45,7 +45,7 @@ done
 # ---------------------------------------------------------------------------
 SCRIPT_DIR="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" && pwd)"
 SRC_DIR="$SCRIPT_DIR"
-BUILD_DIR="${BUILD_DIR:-$SRC_DIR/build}"
+BUILD_DIR="$(cd "${BUILD_DIR:-$SRC_DIR/build}" 2>/dev/null && pwd || echo "$SRC_DIR/build")"
 DIST_DIR="$SRC_DIR/dist"
 
 # ---------------------------------------------------------------------------
@@ -85,33 +85,38 @@ JOBS="${JOBS:-$(nproc 2>/dev/null || echo 2)}"
 # ---------------------------------------------------------------------------
 build() {
     echo "== building (jobs=$JOBS) =="
-
     mkdir -p "$BUILD_DIR"
     cd "$BUILD_DIR"
 
     "$QMAKE" "$SRC_DIR/SPFlashToolAPCore.pro" "CONFIG+=release"
-    make -j"$JOBS"
+
+    echo "== running make (parallel=$JOBS) =="
+    make -j"$JOBS" || {
+        echo ""
+        echo "=== parallel build failed, retrying single-threaded ==="
+        make -j1
+    }
 
     if [ ! -x "$BUILD_DIR/flash_tool" ]; then
-        echo "error: $BUILD_DIR/flash_tool not produced" >&2
-        exit 1
-    fi
-
-    if ! ldd "$BUILD_DIR/flash_tool" >/dev/null 2>&1; then
-        echo "error: flash_tool has missing shared-library dependencies (see ldd)" >&2
-        ldd "$BUILD_DIR/flash_tool" | grep 'not found' >&2 || true
+        echo ""
+        echo "=== DIAGNOSTICS ==="
+        echo "pwd: $(pwd)"
+        echo "BUILD_DIR: $BUILD_DIR"
+        echo "ls build/:"
+        ls -la "$BUILD_DIR"/ 2>/dev/null | head -20
+        echo ""
+        echo "find flash_tool anywhere:"
+        find "$SRC_DIR/build" "$SRC_DIR" -maxdepth 2 -name "flash_tool" -type f 2>/dev/null || true
+        echo "=== END DIAGNOSTICS ==="
         exit 1
     fi
 
     echo "== build OK =="
-
-    # --- build shim for BROM on kernel >= 5.4 --------------------------
     echo "== building patch_brom shim =="
     gcc -shared -fPIC -o "$BUILD_DIR/libpatch_brom.so" \
-        "$SRC_DIR/lib/patch_brom.c" -ldl
-    if [ ! -f "$BUILD_DIR/libpatch_brom.so" ]; then
+        "$SRC_DIR/lib/patch_brom.c" -ldl || {
         echo "warning: libpatch_brom.so build failed" >&2
-    fi
+    }
 }
 
 if [ "$DO_CLEAN" = "1" ]; then
@@ -135,34 +140,26 @@ STAGE="$DIST_DIR/$NAME"
 rm -rf "$STAGE"
 mkdir -p "$STAGE/lib"
 
-# --- the binary ----------------------------------------------------------
 cp "$BUILD_DIR/flash_tool" "$STAGE/flash_tool"
 chmod +x "$STAGE/flash_tool"
 
-# --- launcher -------------------------------------------------------------
 if [ -f "$SRC_DIR/lib/flash_tool.sh" ]; then
     cp "$SRC_DIR/lib/flash_tool.sh" "$STAGE/flash_tool.sh"
     chmod +x "$STAGE/flash_tool.sh"
 fi
 
-# --- prebuilt Mediatek libraries (uppercase not used: all lowercase now) --
 cp "$SRC_DIR"/lib/libflashtool.so* "$STAGE/lib/" 2>/dev/null || true
 cp "$SRC_DIR"/lib/libflashtool.v1.so* "$STAGE/lib/" 2>/dev/null || true
 cp "$SRC_DIR"/lib/libflashtoolEx.so* "$STAGE/lib/" 2>/dev/null || true
 cp "$SRC_DIR"/lib/libsla_challenge.so* "$STAGE/lib/" 2>/dev/null || true
 
-# --- LD_PRELOAD shim for BROM on kernel >= 5.4 --------------------------
 [ -f "$BUILD_DIR/libpatch_brom.so" ] && cp "$BUILD_DIR/libpatch_brom.so" "$STAGE/lib/"
 
-# --- data files (mirrors the original deployment set) ---------------------
 for pat in '*.xml' '*.xsd' '*.ini' '*.bin' '*.json' '*.rules' '*.qhc' '*.qch' '*.sh' '*.conf'; do
     cp "$SRC_DIR"/lib/$pat "$STAGE/" 2>/dev/null || true
 done
 [ -f "$SRC_DIR/Rules/image_map.xml" ] && cp "$SRC_DIR/Rules/image_map.xml" "$STAGE/"
 
-# --- Qt6 / xerces runtime libraries --------------------------------------
-# Collect every NEEDED lib named libQt6* / libxerces* from the binary and
-# from every bundled plugin, then copy it (and its symlink) into lib/.
 needed_of() {
     objdump -p "$1" 2>/dev/null | awk '/NEEDED/ && $2 ~ /^libQt6/ || (/NEEDED/ && $2 ~ /^libxerces/){print $2}'
 }
@@ -173,7 +170,7 @@ resolve_lib() {
         echo "$QT_LIBS/$name"
         return
     fi
-    ldconfig -p 2>/dev/null | awk -v n="$name" '$1==n {print $NF; exit}' 
+    ldconfig -p 2>/dev/null | awk -v n="$name" '$1==n {print $NF; exit}'
 }
 
 copy_runtime_lib() {
@@ -195,12 +192,10 @@ copy_runtime_lib() {
     fi
 }
 
-# 1) dependencies of the binary itself
 while IFS= read -r dep; do
     [ -n "$dep" ] && copy_runtime_lib "$dep"
 done < <(needed_of "$BUILD_DIR/flash_tool")
 
-# 2) Qt plugins
 PLUGIN_CATEGORIES="platforms platforminputcontexts imageformats iconengines \
                    generic xcbglintegrations egldeviceintegrations tls"
 for cat in $PLUGIN_CATEGORIES; do
@@ -215,14 +210,12 @@ for cat in $PLUGIN_CATEGORIES; do
     done
 done
 
-# --- sanity: all bundled runtime deps must resolve from staged lib/ -------
 echo "== verifying staged dependencies =="
 LD_LIBRARY_PATH="$STAGE/lib" ldd "$STAGE/flash_tool" | grep 'not found' && {
     echo "error: staged flash_tool still has unresolved dependencies" >&2
     exit 1
 }
 
-# --- assemble zip ---------------------------------------------------------
 cd "$DIST_DIR"
 if command -v zip >/dev/null 2>&1; then
     rm -f "$NAME.zip"

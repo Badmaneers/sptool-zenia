@@ -6,6 +6,13 @@ on:
     tags: ['v*']
   pull_request:
     branches: [main]
+  workflow_dispatch:
+    inputs:
+      create_release:
+        description: 'Create a GitHub release'
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: write
@@ -49,7 +56,7 @@ jobs:
           file "$DIST_DIR/flash_tool"
           echo ""
           echo "=== Shared library deps ==="
-          LD_LIBRARY_PATH="$DIST_DIR/lib" ldd "$DIST_DIR/flash_tool" | grep -c "not found" || true
+          LD_LIBRARY_PATH="$DIST_DIR/lib" ldd "$DIST_DIR/flash_tool" | grep "not found" && exit 1 || echo "All deps resolved"
           echo ""
           echo "=== Package contents ==="
           ls -lh "$DIST_DIR/" | head -20
@@ -68,7 +75,9 @@ jobs:
 
   release:
     needs: build
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: >-
+      startsWith(github.ref, 'refs/tags/v') ||
+      (github.event_name == 'workflow_dispatch' && inputs.create_release)
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout
@@ -86,7 +95,11 @@ jobs:
         run: |
           cd artifact
           ROOT_DIR=$(ls -d */ | head -1)
-          ZIP_NAME="${{ env.DIST_NAME }}_${GITHUB_REF_NAME}.zip"
+          if [ "${{ github.ref_type }}" = "tag" ]; then
+            ZIP_NAME="${{ env.DIST_NAME }}_${GITHUB_REF_NAME}.zip"
+          else
+            ZIP_NAME="${{ env.DIST_NAME }}_build-${{ github.run_number }}.zip"
+          fi
           zip -r -q "../$ZIP_NAME" "$ROOT_DIR"
           echo "RELEASE_ZIP=$ZIP_NAME" >> "$GITHUB_ENV"
           echo "=== Release package ==="
@@ -95,7 +108,6 @@ jobs:
       - name: Generate changelog
         id: changelog
         run: |
-          # Get commits since last tag
           PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
           if [ -n "$PREV_TAG" ]; then
             LOG=$(git log --pretty=format:"- %s (%h)" "$PREV_TAG"..HEAD --no-merges)
@@ -103,7 +115,6 @@ jobs:
             LOG=$(git log --pretty=format:"- %s (%h)" --no-merges -20)
           fi
 
-          # Write to file for release body
           cat > release_notes.md << 'HEADER'
           ## What's Changed
           HEADER
@@ -112,8 +123,8 @@ jobs:
           echo "" >> release_notes.md
           echo "## Installation" >> release_notes.md
           echo '```bash' >> release_notes.md
-          echo "unzip ${{ env.DIST_NAME }}_${GITHUB_REF_NAME}.zip" >> release_notes.md
-          echo "cd ${{ env.DIST_NAME }}_${GITHUB_REF_NAME}" >> release_notes.md
+          echo "unzip ${{ env.RELEASE_ZIP }}" >> release_notes.md
+          echo "cd ${{ env.DIST_NAME }}_*" >> release_notes.md
           echo "sudo cp 99-ttyacms.rules /etc/udev/rules.d/" >> release_notes.md
           echo "sudo udevadm control --reload-rules" >> release_notes.md
           echo "./flash_tool.sh" >> release_notes.md
@@ -127,7 +138,7 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          name: "SP Flash Tool ${{ github.ref_name }}"
+          name: "SP Flash Tool ${{ github.ref_name || format('build-{0}', github.run_number) }}"
           body_path: release_notes.md
           draft: false
           prerelease: ${{ contains(github.ref_name, '-rc') || contains(github.ref_name, '-beta') || contains(github.ref_name, '-alpha') }}
