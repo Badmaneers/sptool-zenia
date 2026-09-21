@@ -34,31 +34,55 @@ static bool shim_loaded()
     return p && strstr(p, "libpatch_brom.so");
 }
 
-static void ensure_brom_shim(char *argv[])
+static void ensure_env_and_shim(char *argv[])
 {
-    if (shim_loaded())
-        return;
-
     char exe[PATH_MAX];
     ssize_t len = readlink("/proc/self/exe", exe, sizeof(exe) - 1);
     if (len <= 0) return;
     exe[len] = '\0';
 
     std::string dir = std::string(exe).substr(0, std::string(exe).rfind('/'));
-    std::string shim = dir + "/lib/libpatch_brom.so";
 
-    struct stat st;
-    if (stat(shim.c_str(), &st) != 0) return;
+    // Set LD_LIBRARY_PATH to use bundled libs (MTK, shim)
+    std::string ld_path = dir + "/lib";
+    const char *old_ldpath = getenv("LD_LIBRARY_PATH");
+    if (old_ldpath && old_ldpath[0])
+        ld_path = dir + "/lib:" + std::string(old_ldpath);
+    setenv("LD_LIBRARY_PATH", ld_path.c_str(), 1);
 
-    std::string preload = shim;
-    const char *old = getenv("LD_PRELOAD");
-    if (old && old[0]) {
-        preload = std::string(old) + ":" + shim;
+    // Point Qt to system plugins if not already set
+    if (!getenv("QT_PLUGIN_PATH")) {
+        const char *candidates[] = {
+            "/usr/lib/x86_64-linux-gnu/qt6/plugins",
+            "/usr/lib64/qt6/plugins",
+            "/usr/lib/qt6/plugins",
+            "/usr/local/lib/x86_64-linux-gnu/qt6/plugins",
+            NULL
+        };
+        struct stat st;
+        for (int i = 0; candidates[i]; i++) {
+            if (stat(candidates[i], &st) == 0) {
+                setenv("QT_PLUGIN_PATH", candidates[i], 1);
+                break;
+            }
+        }
     }
-    setenv("LD_PRELOAD", preload.c_str(), 1);
-    execv(exe, argv);
-    fprintf(stderr, "[flash_tool] execv failed: %s\n", strerror(errno));
-    _exit(127);
+
+    // Set LD_PRELOAD for BROM shim (reexec once if needed)
+    if (!shim_loaded()) {
+        std::string shim = dir + "/lib/libpatch_brom.so";
+        struct stat st;
+        if (stat(shim.c_str(), &st) == 0) {
+            std::string preload = shim;
+            const char *old = getenv("LD_PRELOAD");
+            if (old && old[0])
+                preload = std::string(old) + ":" + shim;
+            setenv("LD_PRELOAD", preload.c_str(), 1);
+            execv(exe, argv);
+            fprintf(stderr, "[flash_tool] execv failed: %s\n", strerror(errno));
+            _exit(127);
+        }
+    }
 }
 #endif
 
@@ -143,7 +167,7 @@ int main(int argc, char *argv[])
     try
     {
 #ifdef _LINUX
-        ensure_brom_shim(argv);
+        ensure_env_and_shim(argv);
         QCoreApplication::addLibraryPath(QDir::toNativeSeparators("./lib"));
 #endif
         EnableMemLeakCheck();

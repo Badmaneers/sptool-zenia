@@ -18,5 +18,4 @@
      export LD_PRELOAD
  fi
 
- chmod +x "$appname"
  "$dirname/$appname" "$@"
