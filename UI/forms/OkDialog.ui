@@ -30,7 +30,6 @@
   </property>
   <property name="styleSheet">
    <string notr="true">background-image: url(:/images/ok.png);
-background-color: rgb(85, 255, 255);
 background-repeat:no-repeat;
 background-position:center;</string>
   </property>

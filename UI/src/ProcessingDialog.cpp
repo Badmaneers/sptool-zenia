@@ -7,7 +7,8 @@
 
 ProcessingDialog::ProcessingDialog(QWidget *parent)
     : QDialog(parent),
-      ui(new Ui::ProcessingDialog)
+      ui(new Ui::ProcessingDialog),
+      drag_position(0, 0)
 {
     ui->setupUi(this);
     this->setModal(true);

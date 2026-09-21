@@ -163,10 +163,58 @@ QCheckBox {
     color: #d4d4d4;
 }
 
+QCheckBox::indicator {
+    width: 16px;
+    height: 16px;
+    border: 2px solid #6a6a6a;
+    border-radius: 3px;
+    background: #3c3c3c;
+}
+
+QCheckBox::indicator:hover {
+    border: 2px solid #007acc;
+}
+
+QCheckBox::indicator:checked {
+    background: #007acc;
+    border: 2px solid #007acc;
+    border-radius: 3px;
+    image: url(:/images/checkbox_checked.svg);
+}
+
+QCheckBox::indicator:disabled {
+    background: #2d2d2d;
+    border: 2px solid #4a4a4a;
+}
+
 /* ── Radio Button ───────────────────────────────────────────── */
 QRadioButton {
     spacing: 8px;
     color: #d4d4d4;
+}
+
+QRadioButton::indicator {
+    width: 16px;
+    height: 16px;
+    border: 2px solid #6a6a6a;
+    border-radius: 10px;
+    background: #3c3c3c;
+}
+
+QRadioButton::indicator:hover {
+    border: 2px solid #007acc;
+}
+
+QRadioButton::indicator:checked {
+    background: #3c3c3c;
+    border: 2px solid #007acc;
+    border-radius: 10px;
+    image: url(:/images/radio_checked.svg);
+}
+
+QRadioButton::indicator:disabled {
+    background: #2d2d2d;
+    border: 2px solid #4a4a4a;
 }
 
 /* ── Group Box ──────────────────────────────────────────────── */
@@ -333,7 +381,7 @@ QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {
 
 /* ── Menu Bar ───────────────────────────────────────────────── */
 QMenuBar {
-    background: #252526;
+    background: #2d2d2d;
     border-bottom: 1px solid #3c3c3c;
     padding: 2px 0;
     color: #d4d4d4;
@@ -377,9 +425,18 @@ QMenu::separator {
 
 /* ── Status Bar ─────────────────────────────────────────────── */
 QStatusBar {
-    background: #007acc;
-    border-top: none;
-    color: white;
+    background: #252526;
+    border-top: 1px solid #3c3c3c;
+    color: #cccccc;
+}
+
+QStatusBar::item {
+    border: none;
+}
+
+QStatusBar QLabel {
+    border: none;
+    padding: 0 4px;
 }
 
 /* ── Tool Box (left panel) ──────────────────────────────────── */

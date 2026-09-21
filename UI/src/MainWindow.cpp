@@ -765,10 +765,10 @@ void MainWindow::LockOnUI()
 
 bool MainWindow::operation_support_auto_polling()
 {
-    QString tab_page_name = ui->tabWidget->tabText(ui->tabWidget->currentIndex()).trimmed();
-    if (tab_page_name == "&Download"
-            || tab_page_name == "&Readback"
-            || tab_page_name == "Form&at")
+    QWidget *current = ui->tabWidget->currentWidget();
+    if (current == download_widget
+            || current == readback_widget
+            || current == format_widget)
     {
         return true;
     }
@@ -1869,7 +1869,6 @@ void MainWindow::on_actionUSB_UART_options_triggered()
 
 void MainWindow::on_actionPhysical_Format_triggered()
 {
-    ui->actionPhysical_Format->setChecked(ui->actionPhysical_Format->isChecked());
 }
 
 void MainWindow::on_actionParameter_Page_triggered()
@@ -1883,7 +1882,7 @@ void MainWindow::on_actionParameter_Page_triggered()
     }
     else
     {
-        tab_widgets.pop_front();
+        tab_widgets.remove(parameter_widget);
         parameter_widget->Detach();
     }
 }
@@ -1899,7 +1898,7 @@ void MainWindow::on_actionWrite_Memory_triggered()
     }
     else
     {
-        tab_widgets.pop_front();
+        tab_widgets.remove(writeMemory_widget);
         writeMemory_widget->Detach();
     }
 }
@@ -2217,15 +2216,14 @@ void MainWindow::closeEvent(QCloseEvent *e)
 
 void MainWindow::ChangeLanguage(int index)
 {
-    QTranslator qt_translator;
-    QTranslator app_translator;
+    qApp->removeTranslator(&app_translator);
+    qApp->removeTranslator(&qt_translator);
+
     bool result;
     switch(index)
     {
     case 0:
         SetLanguageTag(LANGUAGE_ENGLISH);
-        qApp->removeTranslator(&app_translator);
-
         break;
 
     case 1:
@@ -2244,7 +2242,6 @@ void MainWindow::ChangeLanguage(int index)
             return;
         }
         qApp->installTranslator(&app_translator);
-
         break;
 
     case 2:
@@ -2263,7 +2260,6 @@ void MainWindow::ChangeLanguage(int index)
             return;
         }
         qApp->installTranslator(&app_translator);
-
         break;
     }
 

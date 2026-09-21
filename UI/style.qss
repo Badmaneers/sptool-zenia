@@ -424,6 +424,15 @@ QStatusBar {
     color: #555555;
 }
 
+QStatusBar::item {
+    border: none;
+}
+
+QStatusBar QLabel {
+    border: none;
+    padding: 0 4px;
+}
+
 /* ── Tool Box (left panel) ──────────────────────────────────── */
 QToolBox::tab {
     background: #e8e8e8;

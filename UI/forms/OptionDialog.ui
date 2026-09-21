@@ -253,9 +253,7 @@
            <item>
             <widget class="QComboBox" name="comboBoxTheme">
              <property name="styleSheet">
-              <string notr="true">border: 1px solid rgb(95,95,95);
-border-radius: 3px;
-margin:0 0 0 0;</string>
+              <string notr="true"></string>
              </property>
             </widget>
            </item>
@@ -1237,9 +1235,7 @@ margin:0 0 0 0;</string>
          </rect>
         </property>
         <property name="styleSheet">
-         <string notr="true">border: 1px solid rgb(95,95,95);
-border-radius: 3px;
-margin:0 0 0 0;</string>
+         <string notr="true"></string>
         </property>
         <item>
          <property name="text">
@@ -1374,20 +1370,6 @@ margin:0 0 0 0;</string>
                  <height>23</height>
                 </size>
                </property>
-               <property name="styleSheet">
-                <string notr="true">QPushButton {
-    background: #e8e8e8;
-    border: 1px solid #c0c0c0;
-    border-radius: 3px;
-}
-QPushButton:hover {
-    background: #d0d0d0;
-    border: 1px solid #999;
-}
-QPushButton:pressed {
-    background: #c0c0c0;
-}</string>
-               </property>
                <property name="text">
                 <string/>
                </property>
@@ -1420,9 +1402,7 @@ QPushButton:pressed {
              <item>
               <widget class="QComboBox" name="comboBox__LogDate">
                <property name="styleSheet">
-                <string notr="true">border: 1px solid rgb(95,95,95);
-border-radius: 3px;
-margin:0 0 0 0;</string>
+                <string notr="true"></string>
                </property>
               </widget>
              </item>
@@ -1451,9 +1431,7 @@ margin:0 0 0 0;</string>
                <item>
                 <widget class="QComboBox" name="comboBox_da_log_level">
                  <property name="styleSheet">
-                  <string notr="true">border: 1px solid rgb(95,95,95);
-border-radius: 3px;
-margin:0 0 0 0;</string>
+                  <string notr="true"></string>
                  </property>
                 </widget>
                </item>
@@ -1473,9 +1451,7 @@ margin:0 0 0 0;</string>
              <item>
               <widget class="QComboBox" name="comboBox_da_log_channel">
                <property name="styleSheet">
-                <string notr="true">border: 1px solid rgb(95,95,95);
-border-radius: 3px;
-margin:0 0 0 0;</string>
+                <string notr="true"></string>
                </property>
                <property name="currentIndex">
                 <number>-1</number>
@@ -1556,18 +1532,14 @@ margin:0 0 0 0;</string>
                     <item>
                      <widget class="QComboBox" name="comboPort">
                       <property name="styleSheet">
-                       <string notr="true">border: 1px solid rgb(95,95,95);
-border-radius: 3px;
-margin:0 0 0 0;</string>
+                       <string notr="true"></string>
                       </property>
                      </widget>
                     </item>
                     <item>
                      <widget class="QComboBox" name="comboRate">
                       <property name="styleSheet">
-                       <string notr="true">border: 1px solid rgb(95,95,95);
-border-radius: 3px;
-margin:0 0 0 0;</string>
+                       <string notr="true"></string>
                       </property>
                       <property name="currentIndex">
                        <number>-1</number>
@@ -1691,9 +1663,7 @@ margin:0 0 0 0;</string>
                      <bool>false</bool>
                     </property>
                     <property name="styleSheet">
-                     <string notr="true">border: 1px solid rgb(95,95,95);
-border-radius: 3px;
-margin:0 0 0 0;</string>
+                     <string notr="true"></string>
                     </property>
                     <property name="currentIndex">
                      <number>-1</number>

@@ -6,6 +6,7 @@
 #include <QShortcut>
 #include <QTimer>
 #include <QAbstractButton>
+#include <QTranslator>
 #include "../../Setting/ISetting.h"
 #include "../../Setting/ConnSetting.h"
 #include "../../ConsoleMode/GeneralSetting.h"
@@ -365,6 +366,9 @@ private:
     SendReport *send_report_;
 
     ICallback* otp_status_callback;
+
+    QTranslator qt_translator;
+    QTranslator app_translator;
 
     friend class MainWindowCallback;
 
