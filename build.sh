@@ -69,12 +69,10 @@ if [ -z "$QMAKE" ]; then
 fi
 
 QT_LIBS="$($QMAKE -query QT_INSTALL_LIBS)"
-QT_PLUGINS="$($QMAKE -query QT_INSTALL_PLUGINS)"
 QT_MAKESPEC="$($QMAKE -query QMAKE_SPEC)"
 
 echo "== qmake      : $QMAKE"
 echo "== qt libs    : $QT_LIBS"
-echo "== qt plugins : $QT_PLUGINS"
 echo "== mkspec     : $QT_MAKESPEC"
 echo "== build dir  : $BUILD_DIR"
 

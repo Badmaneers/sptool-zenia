@@ -44,7 +44,7 @@ jobs:
             qt6-base-dev qt6-5compat-dev qt6-tools-dev \
             libgl-dev libx11-dev \
             libxerces-c-dev \
-            patchelf zip
+            zip
 
       - name: Verify toolchain
         run: |

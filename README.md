@@ -14,7 +14,18 @@ A Qt6-based flashing tool for MediaTek Android devices. Supports BROM mode, Down
 ## Requirements
 
 - Linux x86_64 (kernel 5.4+)
-- No system Qt installation required — all Qt6 libraries are bundled
+- **Qt6 runtime libraries** (Qt6Core, Qt6Widgets, Qt6Gui, Qt6Network, Qt6Core5Compat)
+- Xerces-C XML library
+
+### Install dependencies
+
+```bash
+# Ubuntu/Debian
+sudo apt install qt6-base-dev libqt6core5compat6 libxerces-c-dev
+
+# Arch
+sudo pacman -S qt6-base qt6-5compat xerces-c
+```
 
 ## Installation
 
@@ -22,7 +33,7 @@ A Qt6-based flashing tool for MediaTek Android devices. Supports BROM mode, Down
 
 ```bash
 unzip flash_tool_linux_5.3-zenia.zip
-cd flash_tool_linux_5.3-zenia
+cd flash_tool_linux_v5.3-zenia
 ```
 
 2. Install udev rules so the tool can access USB devices without root:
@@ -70,6 +81,8 @@ For BROM mode (preloader/bootrom), the tool automatically detects the device whe
 
 | Issue | Solution |
 |-------|----------|
+| `Could not find Qt platform plugin` | Install Qt6 runtime: `sudo apt install qt6-base-dev` |
+| `libxerces-c.so.3: cannot open shared object` | Install xerces-c: `sudo apt install libxerces-c-dev` |
 | `Connect BROM failed: STATUS_ERR` | Ensure device is powered off and connected via USB. Check udev rules are installed. |
 | No COM ports listed | Install udev rules, add user to `plugdev` group, re-login. |
 | Permission denied on `/dev/ttyACM*` | Run `sudo chmod 666 /dev/ttyACM*` or reinstall udev rules. |
@@ -91,7 +104,7 @@ MT6573, MT6575, MT6577, MT6589, MT6572, MT6582, MT8135, MT6592, MT6571, MT8127, 
 ## File Structure
 
 ```
-flash_tool_linux_5.3-zenia/
+flash_tool_linux_v5.3-zenia/
 ├── flash_tool              # Main binary
 ├── flash_tool.sh           # Launcher script (recommended)
 ├── 99-ttyacms.rules        # udev rules for USB device access
@@ -101,7 +114,7 @@ flash_tool_linux_5.3-zenia/
 ├── option.ini              # Saved settings
 ├── usb_setting.xml         # USB device ID definitions
 ├── platform.xml            # Platform definitions
-├── lib/                    # Runtime libraries (Qt6, MTK, shim)
+├── lib/                    # MTK libraries + BROM shim
 ├── flashtool.qhc           # Qt Assistant help collection
 └── flashtool.qch           # Qt Assistant help data
 ```

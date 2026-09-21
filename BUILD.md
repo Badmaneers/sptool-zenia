@@ -15,6 +15,9 @@ sudo apt install qt6-base-dev qt6-5compat-dev qt6-tools-dev \
 sudo pacman -S qt6-base qt6-5compat
 ```
 
+> **Note:** Qt6 runtime libraries are required on the target system too.
+> The binary links against system Qt6 — it is not bundled.
+
 ### Build Tools
 
 ```bash
@@ -158,7 +161,7 @@ Themes are applied at startup from `style.qss` or `style-dark.qss` embedded in t
 
 ## RPATH Configuration
 
-The binary uses `$ORIGIN` and `$ORIGIN/lib` as RPATH with `--disable-new-dtags` (DT_RPATH instead of DT_RUNPATH). This ensures the precompiled MTK libraries can find Qt6 libraries in the bundled `lib/` directory without requiring system-wide installation.
+The binary uses `$ORIGIN` and `$ORIGIN/lib` as RPATH with `--disable-new-dtags` (DT_RPATH instead of DT_RUNPATH). This ensures the precompiled MTK libraries are found in the bundled `lib/` directory. Qt6 libraries are loaded from the system installation.
 
 ## Troubleshooting the Build
 
