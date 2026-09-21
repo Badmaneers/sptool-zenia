@@ -76,6 +76,14 @@ For BROM mode (preloader/bootrom), the tool automatically detects the device whe
 | Dark theme looks wrong | Go to Options > Appearance and select your preferred theme. |
 | Tool doesn't start | Run `./flash_tool` from terminal and check error output. |
 
+## Building from Source
+
+See [BUILD.md](BUILD.md) for prerequisites, build options, and architecture details.
+
+```bash
+./build.sh
+```
+
 ## Supported Platforms
 
 MT6573, MT6575, MT6577, MT6589, MT6572, MT6582, MT8135, MT6592, MT6571, MT8127, MT6595, MT6752, MT2601, MT8173, MT6795, MT6735, MT6753, MT8163, MT8590, MT6580, MT7623, MT7683

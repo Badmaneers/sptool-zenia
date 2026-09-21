@@ -1,15 +1,10 @@
 name: Build & Release
 
 on:
-  push:
-    branches: [main]
-    tags: ['v*']
-  pull_request:
-    branches: [main]
   workflow_dispatch:
     inputs:
       create_release:
-        description: 'Create a GitHub release'
+        description: 'Create a GitHub release (auto-creates git tag from version.cpp)'
         required: false
         default: false
         type: boolean
@@ -24,9 +19,22 @@ env:
 jobs:
   build:
     runs-on: ubuntu-24.04
+    outputs:
+      version_tag: ${{ steps.version.outputs.tag }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Extract version from source
+        id: version
+        run: |
+          TAG=$(grep -oP 'VERSION_TAG\s*=\s*"\K[^"]+' Utility/version.cpp)
+          if [ -z "$TAG" ]; then
+            echo "error: could not extract VERSION_TAG from Utility/version.cpp" >&2
+            exit 1
+          fi
+          echo "tag=v$TAG" >> "$GITHUB_OUTPUT"
+          echo "=== version tag: v$TAG ==="
 
       - name: Install dependencies
         run: |
@@ -42,10 +50,9 @@ jobs:
         run: |
           qmake6 --version
           g++ --version | head -1
-          echo "Qt6 libraries: $(qmake6 -query QT_INSTALL_LIBS)"
 
       - name: Build
-        run: ./build.sh "${{ env.DIST_NAME }}_${{ github.run_number }}"
+        run: ./build.sh "${{ env.DIST_NAME }}_${{ steps.version.outputs.tag }}"
         env:
           JOBS: 4
 
@@ -60,24 +67,18 @@ jobs:
           echo ""
           echo "=== Package contents ==="
           ls -lh "$DIST_DIR/" | head -20
-          echo ""
-          echo "=== lib/ contents ==="
-          ls "$DIST_DIR/lib/" | wc -l
-          echo " files in lib/"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.DIST_NAME }}_linux
+          name: ${{ env.DIST_NAME }}_${{ steps.version.outputs.tag }}
           path: dist/${{ env.DIST_NAME }}_*/
           if-no-files-found: error
           retention-days: 30
 
   release:
     needs: build
-    if: >-
-      startsWith(github.ref, 'refs/tags/v') ||
-      (github.event_name == 'workflow_dispatch' && inputs.create_release)
+    if: github.event_name == 'workflow_dispatch' && inputs.create_release
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout
@@ -88,25 +89,22 @@ jobs:
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
-          name: ${{ env.DIST_NAME }}_linux
+          name: ${{ env.DIST_NAME }}_${{ needs.build.outputs.version_tag }}
           path: artifact/
 
       - name: Package release
         run: |
+          TAG="${{ needs.build.outputs.version_tag }}"
           cd artifact
           ROOT_DIR=$(ls -d */ | head -1)
-          if [ "${{ github.ref_type }}" = "tag" ]; then
-            ZIP_NAME="${{ env.DIST_NAME }}_${GITHUB_REF_NAME}.zip"
-          else
-            ZIP_NAME="${{ env.DIST_NAME }}_build-${{ github.run_number }}.zip"
-          fi
+          ZIP_NAME="${{ env.DIST_NAME }}_${TAG}.zip"
           zip -r -q "../$ZIP_NAME" "$ROOT_DIR"
           echo "RELEASE_ZIP=$ZIP_NAME" >> "$GITHUB_ENV"
-          echo "=== Release package ==="
+          echo "RELEASE_TAG=$TAG" >> "$GITHUB_ENV"
+          echo "=== Release package: $ZIP_NAME ==="
           ls -lh "../$ZIP_NAME"
 
       - name: Generate changelog
-        id: changelog
         run: |
           PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
           if [ -n "$PREV_TAG" ]; then
@@ -115,33 +113,34 @@ jobs:
             LOG=$(git log --pretty=format:"- %s (%h)" --no-merges -20)
           fi
 
-          cat > release_notes.md << 'HEADER'
-          ## What's Changed
-          HEADER
-          echo "$LOG" >> release_notes.md
+          cat > release_notes.md << EOF
+          ## SP Flash Tool ${{ env.RELEASE_TAG }}
 
-          echo "" >> release_notes.md
-          echo "## Installation" >> release_notes.md
-          echo '```bash' >> release_notes.md
-          echo "unzip ${{ env.RELEASE_ZIP }}" >> release_notes.md
-          echo "cd ${{ env.DIST_NAME }}_*" >> release_notes.md
-          echo "sudo cp 99-ttyacms.rules /etc/udev/rules.d/" >> release_notes.md
-          echo "sudo udevadm control --reload-rules" >> release_notes.md
-          echo "./flash_tool.sh" >> release_notes.md
-          echo '```' >> release_notes.md
+          ### What's Changed
+          $LOG
 
-          echo "" >> release_notes.md
-          echo "## System Requirements" >> release_notes.md
-          echo "- Linux x86_64, kernel 5.4+" >> release_notes.md
-          echo "- No system Qt installation required (all libraries bundled)" >> release_notes.md
+          ### Installation
+          \`\`\`bash
+          unzip ${{ env.RELEASE_ZIP }}
+          cd ${{ env.DIST_NAME }}_${{ env.RELEASE_TAG }}
+          sudo cp 99-ttyacms.rules /etc/udev/rules.d/
+          sudo udevadm control --reload-rules
+          ./flash_tool.sh
+          \`\`\`
+
+          ### System Requirements
+          - Linux x86_64, kernel 5.4+
+          - No system Qt installation required (all libraries bundled)
+          EOF
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          name: "SP Flash Tool ${{ github.ref_name || format('build-{0}', github.run_number) }}"
+          tag_name: ${{ env.RELEASE_TAG }}
+          name: "SP Flash Tool ${{ env.RELEASE_TAG }}"
           body_path: release_notes.md
           draft: false
-          prerelease: ${{ contains(github.ref_name, '-rc') || contains(github.ref_name, '-beta') || contains(github.ref_name, '-alpha') }}
+          prerelease: ${{ contains(env.RELEASE_TAG, '-rc') || contains(env.RELEASE_TAG, '-beta') || contains(env.RELEASE_TAG, '-alpha') }}
           files: ${{ env.RELEASE_ZIP }}
           generate_release_notes: false
         env:
