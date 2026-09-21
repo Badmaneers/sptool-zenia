@@ -38,7 +38,7 @@ static const unsigned int  BUILD_NUM        = 00;
 static const unsigned int  BUILD_SN         = 000;
 //Note: REVISION_NUM is commit hash of the tool, should be HEX(0x...)
 static const unsigned int  REVISION_NUM     = 0x596975;
-static const char* const   BUILD_DATE       = "2026/09/21";
+static const char* const   BUILD_DATE       = __DATE__;
 static const char* const   COMMENTS         = "Qt6 Linux port with dark mode, BROM shim, and modern UI";
 
 static const char* const   APP_NAME         = "SP Flash Tool for Linux";
