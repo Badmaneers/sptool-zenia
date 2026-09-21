@@ -139,6 +139,7 @@ fi
 
 # --- prebuilt Mediatek libraries (uppercase not used: all lowercase now) --
 cp "$SRC_DIR"/lib/libflashtool.so* "$STAGE/lib/" 2>/dev/null || true
+cp "$SRC_DIR"/lib/libflashtool.v1.so* "$STAGE/lib/" 2>/dev/null || true
 cp "$SRC_DIR"/lib/libflashtoolEx.so* "$STAGE/lib/" 2>/dev/null || true
 cp "$SRC_DIR"/lib/libsla_challenge.so* "$STAGE/lib/" 2>/dev/null || true
 

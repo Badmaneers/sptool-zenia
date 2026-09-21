@@ -32,6 +32,7 @@ win32:{
 }
 unix:{
     DEFINES += "_LINUX"
+    QMAKE_LFLAGS += -Wl,--disable-new-dtags
     QMAKE_RPATHDIR += $ORIGIN
     QMAKE_RPATHDIR += $ORIGIN/lib
     QMAKE_RPATHDIR += $ORIGIN/lib/qtlinux/lib

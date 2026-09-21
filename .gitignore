@@ -1,2 +1,13 @@
 build
 dist/
+*.o
+*.a
+flash_tool
+.qmake.stash
+Makefile
+Log/
+moc_*.cpp
+moc_predefs.h
+ui_*.h
+qrc_*.cpp
+build_log.txt
