@@ -2,7 +2,9 @@
 #define SCIDOWNLOADWIDGET_H
 
 #include <QWidget>
-#include <QtGui>
+#include <QDragEnterEvent>
+#include <QDropEvent>
+#include <QMimeData>
 #include "TabWidgetBase.h"
 #include "DLDelegate.h"
 #include "../../Public/AppTypes.h"

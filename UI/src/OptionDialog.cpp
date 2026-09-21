@@ -34,6 +34,7 @@
 #include <QSplitter>
 
 #include <QStyleFactory>
+#include <QFile>
 
 #include <algorithm>
 
@@ -842,63 +843,48 @@ void OptionDialog::on_comboBoxTheme_currentIndexChanged(int index)
 {
     ShowCustomThemeSetting(false);
 
-    switch(index)
-    {
 #ifdef _WIN32
-    case 0:
-        QApplication::setStyle(QStyleFactory::create("windows"));
-        break;
-
-    case 1:
-        QApplication::setStyle(QStyleFactory::create("windowsvista"));
-        break;
-
-    case 2:
-        QApplication::setStyle(QStyleFactory::create("fusion"));
-        break;
-
-    case 3:
-        QApplication::setStyle(QStyleFactory::create("fusion"));
-        break;
-
-    case 4:
+    if(index == 4) {
         main_window_->setStyleSheet("background-image:url(:/images/background.jpg);");
-        break;
-
-    case 5:
-        QApplication::setStyle(QStyleFactory::create("windows"));
-
-        ShowCustomThemeSetting(true);
-
-        break;
-#else
-    case 0:
         QApplication::setStyle(QStyleFactory::create("fusion"));
-        break;
-
-    case 1:
-        QApplication::setStyle(QStyleFactory::create("fusion"));
-        break;
-
-    case 2:
-        main_window_->setStyleSheet("background-image:url(:/images/background.jpg);");
-        break;
-
-    case 3:
-        QApplication::setStyle(QStyleFactory::create("windows"));
-
-        ShowCustomThemeSetting(true);
-
-        break;
-#endif
+    } else {
+        main_window_->setStyleSheet("");
+        switch(index) {
+        case 0: QApplication::setStyle(QStyleFactory::create("fusion")); break;
+        case 1: QApplication::setStyle(QStyleFactory::create("windows")); break;
+        case 2: QApplication::setStyle(QStyleFactory::create("windowsvista")); break;
+        case 3: QApplication::setStyle(QStyleFactory::create("fusion")); break;
+        case 5:
+            QApplication::setStyle(QStyleFactory::create("fusion"));
+            QFile stylesheet(":/style.qss");
+            if (stylesheet.open(QIODevice::ReadOnly | QIODevice::Text)) {
+                main_window_->setStyleSheet(stylesheet.readAll());
+                stylesheet.close();
+            }
+            ShowCustomThemeSetting(true);
+            break;
+        }
     }
-
-#ifdef _WIN32
-    if(index != 4)
-        main_window_->setStyleSheet("");
 #else
-    if(index != 2)
+    if(index == 2) {
+        main_window_->setStyleSheet("background-image:url(:/images/background.jpg);");
+        QApplication::setStyle(QStyleFactory::create("fusion"));
+    } else {
         main_window_->setStyleSheet("");
+        switch(index) {
+        case 0: QApplication::setStyle(QStyleFactory::create("fusion")); break;
+        case 1: QApplication::setStyle(QStyleFactory::create("fusion")); break;
+        case 3:
+            QApplication::setStyle(QStyleFactory::create("fusion"));
+            QFile stylesheet(":/style.qss");
+            if (stylesheet.open(QIODevice::ReadOnly | QIODevice::Text)) {
+                main_window_->setStyleSheet(stylesheet.readAll());
+                stylesheet.close();
+            }
+            ShowCustomThemeSetting(true);
+            break;
+        }
+    }
 #endif
 }
 
@@ -907,11 +893,14 @@ void OptionDialog::InitThemeItems()
     QStringList itemList;
 
 #ifdef _WIN32
-    itemList << "Window XP" << "Window Vista"
-             << "Plastique" << "Motif"
-             << "Classic";
+    itemList << "Modern (Default)" << "Windows Classic"
+             << "Windows Vista"
+             << "Plastique" << "Classic"
+             << "Custom (QSS)";
 #else
-    itemList << "Plastique" << "Motif";
+    itemList << "Modern (Default)" << "Fusion"
+             << "Classic"
+             << "Custom (QSS)";
 #endif
 
     ui->comboBoxTheme->addItems(itemList);

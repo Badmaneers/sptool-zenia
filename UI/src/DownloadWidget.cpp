@@ -13,10 +13,8 @@
 #include "../../Err/Exception.h"
 
 #include <QtDebug>
-#include <QtGui>
 #include <QFileDialog>
-#include <QTextCodec>
-#include <QRegExp>
+#include <QSettings>
 #include <algorithm>
 
 const static std::map<int, int>::value_type init_values[] = {

@@ -2,7 +2,6 @@
 #define CLONEDOWNLOADWIDGET_H
 
 #include <QWidget>
-#include <QtGui>
 #include "TabWidgetBase.h"
 
 namespace Ui {

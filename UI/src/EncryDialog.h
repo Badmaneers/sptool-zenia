@@ -2,7 +2,8 @@
 #define ENCRYDIALOG_H
 
 #include <QDialog>
-#include <QtGui>
+#include <QCloseEvent>
+#include <QShowEvent>
 
 namespace Ui {
 class EncryDialog;

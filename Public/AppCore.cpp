@@ -22,9 +22,9 @@
 #include "../Utility/FileUtils.h"
 #include "RomInfoFactory.h"
 
-#include <QtGui>
 #include <QFile>
 #include <QDir>
+#include <QSettings>
 
 AppCore::AppCore()
 {

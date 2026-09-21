@@ -6,7 +6,7 @@
 #include "IniItem.h"
 #include "FileUtils.h"
 #include "version.h"
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QTime>
 #include <iostream>
 #include <algorithm>
@@ -227,10 +227,10 @@ EMMC_Part_E GetPartID(int index)
 */
 int Utils::GetPortNumFromStr(const QString& str)
 {
-    QRegExp regex("COM(\\d+)");
-    if(regex.indexIn(str)!= -1){
-        QString port = regex.cap(1);
-        return port.toInt();
+    QRegularExpression regex("COM(\\d+)");
+    QRegularExpressionMatch match = regex.match(str);
+    if(match.hasMatch()){
+        return match.captured(1).toInt();
     }
     return 0;
 }
@@ -272,9 +272,10 @@ QString Utils::GetPlatformFromScatter(const QString& scatter_file)
 {
     QString short_name = ExtractFileFromPath(scatter_file);
 
-    QRegExp regex("[m|M][t|T](\\d{4})");
-    if(regex.indexIn(short_name)!= -1){
-        QString platform_id = regex.cap(1);
+    QRegularExpression regex("[mM][tT](\\d{4})");
+    QRegularExpressionMatch match = regex.match(short_name);
+    if(match.hasMatch()){
+        QString platform_id = match.captured(1);
         LOG("get platform from scatter: MT%s",platform_id.toLatin1().constData());
         return "MT"+platform_id;
     }

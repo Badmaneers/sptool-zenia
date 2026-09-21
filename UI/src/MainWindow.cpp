@@ -47,8 +47,15 @@
 #include "../../Network/NetworkThread.h"
 
 #include <QtDebug>
-#include <QtGui>
+#include <QImage>
+#include <QPixmap>
+#include <QIcon>
+#include <QKeySequence>
+#include <QResizeEvent>
+#include <QShowEvent>
+#include <QCloseEvent>
 #include <QFileDialog>
+#include <QSettings>
 #include <algorithm>
 
 MainWindow::MainWindow(QWidget *parent) :

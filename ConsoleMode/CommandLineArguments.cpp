@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <QString>
 #include <QStringList>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <algorithm>
 #include <cctype>
 #include "../Utility/FileUtils.h"
@@ -587,9 +587,9 @@ bool CommandLineArguments::valid_com_port(const QString &usb_com_port) const
     int port_num = Utils::GetPortNumFromStr(usb_com_port);
     return port_num > 0;
 #else
-    QRegExp regex("^\\d+-\\d+(?:\\.\\d+)*$");
-    int pos = regex.indexIn(usb_com_port);
-    return pos != -1;
+    QRegularExpression regex("^\\d+-\\d+(?:\\.\\d+)*$");
+    QRegularExpressionMatch match = regex.match(usb_com_port);
+    return match.hasMatch();
 #endif
 }
 

@@ -3,7 +3,6 @@
 
 #include <QWidget>
 #include "TabWidgetBase.h"
-#include <QtGui>
 
 #include "../../BootRom/DOWNLOAD.H"
 #include "../../Setting/WriteMemorySetting.h"

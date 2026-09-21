@@ -3,7 +3,7 @@
 #include "ui_ProcessingDialog.h"
 #include "../../Host/Inc/RuntimeMemory.h"
 
-#include <QtGui>
+#include <QMouseEvent>
 
 ProcessingDialog::ProcessingDialog(QWidget *parent)
     : QDialog(parent),

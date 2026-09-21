@@ -8,7 +8,9 @@
 #include "../../Setting/PlatformSetting.h"
 #include <QSharedPointer>
 #include <list>
-#include <QtGui>
+#include <QDragEnterEvent>
+#include <QDropEvent>
+#include <QMimeData>
 #include <QtWidgets/QTableWidgetItem>
 #include <QStringList>
 #include <QMap>

@@ -2,6 +2,8 @@
 #include <QApplication>
 #include <QSplashScreen>
 #include <QString>
+#include <QStyleFactory>
+#include <QFile>
 #include <iostream>
 #include <QDir>
 
@@ -28,6 +30,15 @@ static void init_app_path(char* argv[])
 static int runQtApplication(int argc, char *argv[])
 {
     FlashToolApp a(argc, argv);
+
+    a.setStyle(QStyleFactory::create("Fusion"));
+
+    QFile stylesheet(":/style.qss");
+    if (stylesheet.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        a.setStyleSheet(stylesheet.readAll());
+        stylesheet.close();
+    }
+
     if(ToolInfo::IsTempVer() == true)
     {
         TempPlcCtrl plcCtrl;
