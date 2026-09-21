@@ -22,9 +22,6 @@ win32:MISC_FILES = $$replace(MISC_FILES, /, \\)
 win32:RELEASE_LIBRARY_FILES = $$replace(RELEASE_LIBRARY_FILES, /, \\)
 win32:TARGET_FILE = $$replace(TARGET_FILE, /, \\)
 win32:COMMAND_SEPERATE = &
-unix:MISC_FILES = $$replace(MISC_FILES, \\, /)
-unix:RELEASE_LIBRARY_FILES = $$replace(RELEASE_LIBRARY_FILES, \\, /)
-unix:TARGET_FILE = $$replace(TARGET_FILE, \\, /)
 unix:COMMAND_SEPERATE = ;
 
 win32:{
