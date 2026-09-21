@@ -16,6 +16,7 @@
 #include <cerrno>
 #include <cstring>
 #include <cstdlib>
+#include <cstdint>
 
 #include <QCoreApplication>
 #include <QDir>
@@ -361,13 +362,25 @@ unsigned int FileUtils::GetFileSize(const std::string &filename)
 unsigned char* FileUtils::GetFileContent(const std::string &filename)
 {
     std::ifstream is(filename.c_str(), std::ios::in | std::ios::binary);
-    is.seekg(0, std::ios::end);
+    if (!is.is_open())
+        return NULL;
 
-    const unsigned int size = is.tellg();
-    unsigned char *content = new unsigned char[size];
+    is.seekg(0, std::ios::end);
+    std::streampos pos = is.tellg();
+    if (pos <= 0)
+        return NULL;
+
+    const size_t size = static_cast<size_t>(pos);
+    unsigned char *content = new (std::nothrow) unsigned char[size];
+    if (!content)
+        return NULL;
 
     is.seekg(0, std::ios::beg);
-    is.read((char*)content, size);
+    is.read(reinterpret_cast<char*>(content), size);
+    if (!is.good()) {
+        delete[] content;
+        return NULL;
+    }
     is.close();
 
     return content;
@@ -397,7 +410,7 @@ bool FileUtils::ComputeCloneCheckSum(const std::string &src_file, RomMemChecksum
         return false;
     }
 
-    unsigned int file_len = 0;
+    uint64_t file_len = 0;
     if( 0 >= (file_len=file_stat.st_size) ) {
         fclose(file);
         return false;
@@ -407,11 +420,12 @@ bool FileUtils::ComputeCloneCheckSum(const std::string &src_file, RomMemChecksum
     unsigned int read_size = 0;
     static unsigned char lastPercentage = 0;
     unsigned char percentage = 0;
-    unsigned int position = 0;
+    uint64_t position = 0;
     while(!feof(file))
     {
         read_size = fread(buffer, 1, 1024, file);
         position = ftell(file);
+        if (position < 0) break;
         percentage = static_cast<unsigned char>((static_cast<float> (position)/file_len)*100);
         if (lastPercentage != percentage)
         {
@@ -555,7 +569,9 @@ int FileUtils::LoadFileInfo(const char *pathname, unsigned int *p_nFileLength, l
     memset(&file_stat, 0, sizeof(struct stat));
     if(fstat(fileno(fp), &file_stat)) return 2;
     fseek(fp, 0, SEEK_END);
-    *p_nFileLength = ftell(fp);
+    long pos = ftell(fp);
+    if (pos < 0) return 2;
+    *p_nFileLength = pos;
 #endif
 
     Q_ASSERT((*p_nFileLength) > 0);
@@ -664,6 +680,24 @@ void DumpKernelInfo(const struct utsname &kernel_info)
 #endif
 }
 
+static int compare_versions(const std::string &a, const std::string &b)
+{
+    std::istringstream sa(a), sb(b);
+    std::string seg;
+    while (true) {
+        std::string va, vb;
+        if (!std::getline(sa, va, '.')) va = "0";
+        if (!std::getline(sb, vb, '.')) vb = "0";
+        int ia = atoi(va.c_str());
+        int ib = atoi(vb.c_str());
+        if (ia != ib) return ia - ib;
+        if (va.find_first_not_of("0123456789") == std::string::npos &&
+            vb.find_first_not_of("0123456789") == std::string::npos)
+            break;
+    }
+    return 0;
+}
+
 bool FileUtils::IsValidKernelVersion()
 {
     struct utsname buf;
@@ -683,8 +717,8 @@ bool FileUtils::IsValidKernelVersion()
         }
         std::string cur_kernel_version = kernel_release.substr(0, found);
         std::cout << "cur_kernel_version = " << cur_kernel_version << std::endl;
-        bool is_valid_kernel = (KERNEL_INVALID_MIN_VERSION > cur_kernel_version
-                || cur_kernel_version >= KERNEL_INVALID_MAX_VERSION);
+        bool is_valid_kernel = (compare_versions(KERNEL_INVALID_MIN_VERSION, cur_kernel_version) > 0
+                || compare_versions(cur_kernel_version, KERNEL_INVALID_MAX_VERSION) >= 0);
         return is_valid_kernel;
     }
 }

@@ -37,7 +37,7 @@ int DeviceScan::init_hotplug_sock()
     struct sockaddr_nl snl;
     bzero(&snl, sizeof(struct sockaddr_nl));
     snl.nl_family = AF_NETLINK;
-    snl.nl_pid = getpid();
+    snl.nl_pid = 0;
     snl.nl_groups = 1;
 
     int s = socket(PF_NETLINK, SOCK_DGRAM, NETLINK_KOBJECT_UEVENT);
