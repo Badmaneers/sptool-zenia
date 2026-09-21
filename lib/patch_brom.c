@@ -3,10 +3,12 @@
  *
  * Copyright (c) 2026 Badmaneers. All rights reserved.
  *
- * Kernel 5.4+ CDC ACM driver rejects TIOCGSERIAL / TIOCSSERIAL ioctls
- * (returns EOPNOTSUPP).  The precompiled BROM library treats this as a
- * fatal error.  This shim intercepts the failing ioctls on /dev/ttyACM*
- * and returns fake success so the library can proceed.
+ * Kernel 5.4+ CDC ACM driver rejects various ioctls on /dev/ttyACM*
+ * (returns EOPNOTSUPP), including TIOCGSERIAL/TIOCSSERIAL and serial
+ * port setup ioctls used during open().  The precompiled BROM library
+ * treats these as fatal errors.  This shim intercepts all failing
+ * ioctls on /dev/ttyACM* and returns fake success so the library
+ * can proceed.
  *
  */
 
@@ -58,29 +60,9 @@ int ioctl(int fd, unsigned long request, ...)
     saved_errno = errno;
 
     if (ret < 0 && saved_errno == EOPNOTSUPP && is_ttyACM(fd)) {
-        switch (request) {
-        case TIOCGSERIAL: {
-            struct serial_struct *ss = (struct serial_struct *)arg;
-            if (ss) {
-                memset(ss, 0, sizeof(*ss));
-                ss->type      = PORT_UNKNOWN;
-                ss->line      = 0;
-                ss->port      = 0;
-                ss->irq       = 0;
-                ss->flags     = ASYNC_SKIP_TEST | ASYNC_LOW_LATENCY;
-                ss->baud_base = 115200;
-            }
-            fprintf(stderr, "[patch_brom] TIOCGSERIAL -> faked OK\n");
-            errno = 0;
-            return 0;
-        }
-        case TIOCSSERIAL:
-            fprintf(stderr, "[patch_brom] TIOCSSERIAL -> faked OK\n");
-            errno = 0;
-            return 0;
-        default:
-            break;
-        }
+        fprintf(stderr, "[patch_brom] ioctl 0x%lx -> EOPNOTSUPP swallowed on ttyACM\n", request);
+        errno = 0;
+        return 0;
     }
 
 pass_through:
