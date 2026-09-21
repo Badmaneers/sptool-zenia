@@ -1,6 +1,8 @@
 /*
  * patch_brom.c -- LD_PRELOAD shim for BROM mode on kernel >= 5.4
  *
+ * Copyright (c) 2026 Badmaneers. All rights reserved.
+ *
  * Kernel 5.4+ CDC ACM driver rejects TIOCGSERIAL / TIOCSSERIAL ioctls
  * (returns EOPNOTSUPP).  The precompiled BROM library treats this as a
  * fatal error.  This shim intercepts the failing ioctls on /dev/ttyACM*
@@ -45,8 +47,12 @@ int ioctl(int fd, unsigned long request, ...)
     arg = va_arg(args, void *);
     va_end(args);
 
-    if (!__atomic_load_n(&real_ioctl, __ATOMIC_ACQUIRE))
-        __atomic_store_n(&real_ioctl, dlsym(RTLD_NEXT, "ioctl"), __ATOMIC_RELEASE);
+    if (!__atomic_load_n(&real_ioctl, __ATOMIC_ACQUIRE)) {
+        void (*tmp)(void) = dlsym(RTLD_NEXT, "ioctl");
+        if (!tmp)
+            goto pass_through;
+        __atomic_store_n(&real_ioctl, (void*)tmp, __ATOMIC_RELEASE);
+    }
 
     ret = real_ioctl(fd, request, arg);
     saved_errno = errno;
@@ -77,6 +83,7 @@ int ioctl(int fd, unsigned long request, ...)
         }
     }
 
+pass_through:
     errno = saved_errno;
     return ret;
 }
