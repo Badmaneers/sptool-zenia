@@ -1,0 +1,86 @@
+# SP Flash Tool for Linux
+
+A Qt6-based flashing tool for MediaTek Android devices. Supports BROM mode, Download Agent mode, format, readback, memory test, firmware upgrade, and more.
+
+## Requirements
+
+- Linux x86_64 (kernel 5.4+)
+- No system Qt installation required — all Qt6 libraries are bundled
+
+## Installation
+
+1. Extract the release archive:
+
+```bash
+unzip flash_tool_linux_<date>.zip
+cd flash_tool_linux_<date>
+```
+
+2. Install udev rules so the tool can access USB devices without root:
+
+```bash
+sudo cp 99-ttyacms.rules /etc/udev/rules.d/
+sudo udevadm control --reload-rules
+sudo udevadm trigger
+```
+
+3. Launch the tool:
+
+```bash
+./flash_tool.sh
+```
+
+Or run the binary directly (auto-loads the BROM shim):
+
+```bash
+./flash_tool
+```
+
+## First Launch
+
+- The tool starts in **Dark Mode** with **UART** as the default connection type.
+- To change theme or connection settings, go to **Options > USB and UART options**.
+- If you don't see any COM ports listed, ensure the udev rules are installed and your user is in the `plugdev` group:
+
+```bash
+sudo usermod -aG plugdev $USER
+```
+
+Log out and back in for the group change to take effect.
+
+## Connecting a Device
+
+1. Power off the device completely.
+2. Connect the device via USB.
+3. In the tool, select the correct COM port (for UART) or use USB mode.
+4. Click **Connect**.
+
+For BROM mode (preloader/bootrom), the tool automatically detects the device when it enters BROM mode. On kernel 5.4+, a built-in shim handles the CDC ACM ioctl compatibility — no manual configuration needed.
+
+## Troubleshooting
+
+| Issue | Solution |
+|-------|----------|
+| `Connect BROM failed: STATUS_ERR` | Ensure device is powered off and connected via USB. Check udev rules are installed. |
+| No COM ports listed | Install udev rules, add user to `plugdev` group, re-login. |
+| Permission denied on `/dev/ttyACM*` | Run `sudo chmod 666 /dev/ttyACM*` or reinstall udev rules. |
+| Dark theme looks wrong | Go to Options > Appearance and select your preferred theme. |
+| Tool doesn't start | Run `./flash_tool` from terminal and check error output. |
+
+## File Structure
+
+```
+flash_tool_linux_<date>/
+├── flash_tool              # Main binary
+├── flash_tool.sh           # Launcher script (recommended)
+├── 99-ttyacms.rules        # udev rules for USB device access
+├── MTK_AllInOne_DA.bin     # Download Agent binary
+├── DA_PL.bin               # Preloader DA
+├── DA_SWSEC.bin            # Secure DA
+├── option.ini              # Saved settings
+├── usb_setting.xml         # USB device ID definitions
+├── platform.xml            # Platform definitions
+├── lib/                    # Runtime libraries (Qt6, MTK, shim)
+├── flashtool.qhc           # Qt Assistant help collection
+└── flashtool.qch           # Qt Assistant help data
+```
