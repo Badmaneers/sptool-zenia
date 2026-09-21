@@ -1307,124 +1307,36 @@ margin:0 0 0 0;</string>
        </widget>
       </widget>
       <widget class="QWidget" name="page_Tracing">
-       <widget class="QLabel" name="label_13">
-        <property name="geometry">
-         <rect>
-          <x>20</x>
-          <y>10</y>
-          <width>91</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>10</pointsize>
-          <weight>75</weight>
-          <bold>true</bold>
-         </font>
-        </property>
-        <property name="text">
-         <string>Tracing</string>
-        </property>
-       </widget>
-       <widget class="Line" name="line_5">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>30</y>
-          <width>421</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-       </widget>
-       <widget class="QGroupBox" name="groupBox_DA_log">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>190</y>
-          <width>421</width>
-          <height>111</height>
-         </rect>
-        </property>
-        <property name="title">
-         <string>DA_log</string>
-        </property>
-        <layout class="QGridLayout" name="gridLayout_3">
-         <item row="0" column="0">
-          <layout class="QVBoxLayout" name="verticalLayout_4">
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_da_log_level">
-             <item>
-              <widget class="QLabel" name="label_DA_log_level">
-               <property name="text">
-                <string>DA_log_level</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QComboBox" name="comboBox_da_log_level">
-               <property name="styleSheet">
-                <string notr="true">border: 1px solid rgb(95,95,95);
-border-radius: 3px;
-margin:0 0 0 0;</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-          </layout>
-         </item>
-         <item row="1" column="0">
-          <layout class="QHBoxLayout" name="horizontalLayout_14">
-           <item>
-            <widget class="QLabel" name="label_da_log_channel">
-             <property name="text">
-              <string>DA_log_channel</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QComboBox" name="comboBox_da_log_channel">
-             <property name="styleSheet">
-              <string notr="true">border: 1px solid rgb(95,95,95);
-border-radius: 3px;
-margin:0 0 0 0;</string>
-             </property>
-             <property name="currentIndex">
-              <number>-1</number>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-        </layout>
-       </widget>
-       <widget class="QGroupBox" name="groupBox_enable_tool_log">
-        <property name="geometry">
-         <rect>
-          <x>11</x>
-          <y>60</y>
-          <width>421</width>
-          <height>100</height>
-         </rect>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>100</height>
-         </size>
-        </property>
-        <property name="title">
-         <string>Enabling Tool Log</string>
-        </property>
-        <property name="checkable">
-         <bool>true</bool>
-        </property>
-        <layout class="QGridLayout" name="gridLayout_9">
-         <item row="1" column="0">
+       <layout class="QVBoxLayout" name="verticalLayout_tracing">
+        <item>
+         <widget class="QLabel" name="label_13">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>Tracing</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="Line" name="line_5">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="groupBox_enable_tool_log">
+          <property name="title">
+           <string>Enabling Tool Log</string>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
+          </property>
           <layout class="QVBoxLayout" name="verticalLayout_14">
            <property name="spacing">
             <number>6</number>
@@ -1434,23 +1346,8 @@ margin:0 0 0 0;</string>
              <property name="spacing">
               <number>6</number>
              </property>
-             <property name="sizeConstraint">
-              <enum>QLayout::SetDefaultConstraint</enum>
-             </property>
              <item>
               <widget class="QLabel" name="label_14">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>100</width>
-                 <height>20</height>
-                </size>
-               </property>
                <property name="text">
                 <string>Log File Path:</string>
                </property>
@@ -1458,12 +1355,6 @@ margin:0 0 0 0;</string>
              </item>
              <item>
               <widget class="QLineEdit" name="lineEdit_logPath">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
                <property name="readOnly">
                 <bool>true</bool>
                </property>
@@ -1471,12 +1362,6 @@ margin:0 0 0 0;</string>
              </item>
              <item>
               <widget class="QPushButton" name="btn_logPath">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
                <property name="minimumSize">
                 <size>
                  <width>25</width>
@@ -1489,8 +1374,32 @@ margin:0 0 0 0;</string>
                  <height>23</height>
                 </size>
                </property>
+               <property name="styleSheet">
+                <string notr="true">QPushButton {
+    background: #e8e8e8;
+    border: 1px solid #c0c0c0;
+    border-radius: 3px;
+}
+QPushButton:hover {
+    background: #d0d0d0;
+    border: 1px solid #999;
+}
+QPushButton:pressed {
+    background: #c0c0c0;
+}</string>
+               </property>
                <property name="text">
-                <string>...</string>
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="../../icon.qrc">
+                 <normaloff>:/images/openFolder.png</normaloff>:/images/openFolder.png</iconset>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>16</width>
+                 <height>16</height>
+                </size>
                </property>
               </widget>
              </item>
@@ -1500,9 +1409,6 @@ margin:0 0 0 0;</string>
             <layout class="QHBoxLayout" name="horizontalLayout_8">
              <property name="spacing">
               <number>6</number>
-             </property>
-             <property name="sizeConstraint">
-              <enum>QLayout::SetDefaultConstraint</enum>
              </property>
              <item>
               <widget class="QLabel" name="label_15">
@@ -1523,9 +1429,78 @@ margin:0 0 0 0;</string>
             </layout>
            </item>
           </layout>
-         </item>
-        </layout>
-       </widget>
+         </widget>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="groupBox_DA_log">
+          <property name="title">
+           <string>DA_log</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_3">
+           <item row="0" column="0">
+            <layout class="QVBoxLayout" name="verticalLayout_4">
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_da_log_level">
+               <item>
+                <widget class="QLabel" name="label_DA_log_level">
+                 <property name="text">
+                  <string>DA_log_level</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QComboBox" name="comboBox_da_log_level">
+                 <property name="styleSheet">
+                  <string notr="true">border: 1px solid rgb(95,95,95);
+border-radius: 3px;
+margin:0 0 0 0;</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </item>
+           <item row="1" column="0">
+            <layout class="QHBoxLayout" name="horizontalLayout_14">
+             <item>
+              <widget class="QLabel" name="label_da_log_channel">
+               <property name="text">
+                <string>DA_log_channel</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QComboBox" name="comboBox_da_log_channel">
+               <property name="styleSheet">
+                <string notr="true">border: 1px solid rgb(95,95,95);
+border-radius: 3px;
+margin:0 0 0 0;</string>
+               </property>
+               <property name="currentIndex">
+                <number>-1</number>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_tracing">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
       </widget>
       <widget class="QWidget" name="page_Conn">
        <layout class="QGridLayout" name="gridLayout_14">

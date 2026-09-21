@@ -203,6 +203,8 @@
         <file>help/images/general015.png</file>
         <file>help/images/dbg003.png</file>
         <file>images/dramrepair.png</file>
+        <file>images/checkbox_checked.svg</file>
+        <file>images/radio_checked.svg</file>
         <file>style.qss</file>
         <file>style-dark.qss</file>
     </qresource>

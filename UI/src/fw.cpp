@@ -5,6 +5,7 @@
 #include "ICallback.h"
 #include <QFile>
 #include <QFileDialog>
+#include "FileDialogHelper.h"
 #include <QRegularExpressionValidator>
 
 FW::FW(QTabWidget *parent, MainWindow *window) :
@@ -31,7 +32,7 @@ FW::~FW()
 
 void FW::on_toolButton_openFwFile_clicked()
 {
-    QString file_name = QFileDialog::getOpenFileName(
+    QString file_name = FileDialogHelper::getOpenFileName(
                 this,
                 tr("Open UFS Firmware Upgrade File"),
                 FileUtils::GetAppDirectory().c_str(),

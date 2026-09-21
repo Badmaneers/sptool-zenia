@@ -4,6 +4,7 @@
 #include "MainController.h"
 #include "ICallback.h"
 #include <QFileDialog>
+#include "FileDialogHelper.h"
 #include "./Utility/IniItem.h"
 
 CloneDownloadWidget::CloneDownloadWidget(QTabWidget *parent, MainWindow *window) :
@@ -61,7 +62,7 @@ void CloneDownloadWidget::enableControl(bool enable)
 
 void CloneDownloadWidget::on_pushButton_readback_clicked()
 {
-    QString dir = QFileDialog::getExistingDirectory(this,
+    QString dir = FileDialogHelper::getExistingDirectory(this,
                                       tr("CloneDownload"),
                                       "");
 
@@ -76,7 +77,7 @@ void CloneDownloadWidget::on_pushButton_restore_clicked()
 {
     IniItem item("history.ini", "CloneLastDir", "lastDir");
     QString dir = item.GetStringValue();
-    QString dir_name = QFileDialog::getExistingDirectory(this,
+    QString dir_name = FileDialogHelper::getExistingDirectory(this,
                                                      tr("CloneDownload"),
                                                      dir
                                                      );

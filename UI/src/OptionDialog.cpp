@@ -19,6 +19,7 @@
 #include <QFileDialog>
 #include <QLibrary>
 #include <QDateTime>
+#include "FileDialogHelper.h"
 #include "../../Utility/FileUtils.h"
 #include "../../Utility/LogFilesClean.h"
 #include "../../Host/Inc/RuntimeMemory.h"
@@ -1300,8 +1301,11 @@ void OptionDialog::on_btn_logPath_clicked()
 {
     QString sCurrentLogPath = QString::fromLocal8Bit(Logger::GetLogger().GetSPFlashToolLogFolder().c_str());
     sCurrentLogPath = QDir::toNativeSeparators(sCurrentLogPath).trimmed();
-    QString sSelectedLogPath = QFileDialog::getExistingDirectory(this, LoadQString(LANGUAGE_TAG, IDS_STRING_SELECT_LOG_PATH),
-                                                                 sCurrentLogPath, QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+
+    QString sSelectedLogPath = FileDialogHelper::getExistingDirectory(this,
+        LoadQString(LANGUAGE_TAG, IDS_STRING_SELECT_LOG_PATH),
+        sCurrentLogPath, QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+
     sSelectedLogPath = QDir::toNativeSeparators(sSelectedLogPath).trimmed();
     if (!sSelectedLogPath.isEmpty() && sCurrentLogPath != sSelectedLogPath)
     {

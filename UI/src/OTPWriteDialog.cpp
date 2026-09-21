@@ -3,6 +3,7 @@
 
 #include <QDir>
 #include <QFileDialog>
+#include "FileDialogHelper.h"
 #include <QTextCodec>
 #include <QRegularExpressionValidator>
 #include "../../Utility/FileUtils.h"
@@ -119,7 +120,7 @@ OTP_OPERATION OTPWriteDialog::get_otp_oper()const
 
 void OTPWriteDialog::on_pb_OTPfile_path_clicked()
 {
-    QString file_name = QFileDialog::getOpenFileName(
+    QString file_name = FileDialogHelper::getOpenFileName(
         this,
         LoadQString(lang_tag, IDS_STRING_OPEN_OTP_FILE),
         FileUtils::GetAppDirectory().c_str(),

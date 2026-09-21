@@ -1,6 +1,4 @@
-/* SP Flash Tool - Modern Flat Theme
- * Fusion-based with clean dark titlebar and light content areas.
- */
+/* SP Flash Tool - Modern Flat Theme (Light) */
 
 /* ── Global ─────────────────────────────────────────────────── */
 * {
@@ -84,21 +82,24 @@ QPushButton:flat:hover {
     color: #1a73e8;
 }
 
-/* ── Tool Buttons ───────────────────────────────────────────── */
+/* ── Tool Buttons (Download/Stop/Cert) ──────────────────────── */
 QToolButton {
-    background-color: #e8e8e8;
-    border: 1px solid #c0c0c0;
+    background: transparent;
+    border: none;
     border-radius: 4px;
-    padding: 5px 10px;
+    padding: 6px 12px;
 }
 
 QToolButton:hover {
-    background-color: #dce8f8;
-    border: 1px solid #1a73e8;
+    background-color: #e3f2fd;
 }
 
 QToolButton:pressed {
     background-color: #c5d9f2;
+}
+
+QToolButton:disabled {
+    color: #b0bec5;
 }
 
 /* ── Combo Box ──────────────────────────────────────────────── */
@@ -160,9 +161,57 @@ QCheckBox {
     spacing: 8px;
 }
 
+QCheckBox::indicator {
+    width: 16px;
+    height: 16px;
+    border: 2px solid #999999;
+    border-radius: 3px;
+    background: white;
+}
+
+QCheckBox::indicator:hover {
+    border: 2px solid #1a73e8;
+}
+
+QCheckBox::indicator:checked {
+    background: #1a73e8;
+    border: 2px solid #1a73e8;
+    border-radius: 3px;
+    image: url(:/images/checkbox_checked.svg);
+}
+
+QCheckBox::indicator:disabled {
+    background: #e0e0e0;
+    border: 2px solid #cccccc;
+}
+
 /* ── Radio Button ───────────────────────────────────────────── */
 QRadioButton {
     spacing: 8px;
+}
+
+QRadioButton::indicator {
+    width: 16px;
+    height: 16px;
+    border: 2px solid #999999;
+    border-radius: 10px;
+    background: white;
+}
+
+QRadioButton::indicator:hover {
+    border: 2px solid #1a73e8;
+}
+
+QRadioButton::indicator:checked {
+    background: white;
+    border: 2px solid #1a73e8;
+    border-radius: 10px;
+    image: url(:/images/radio_checked.svg);
+}
+
+QRadioButton::indicator:disabled {
+    background: #e0e0e0;
+    border: 2px solid #cccccc;
 }
 
 /* ── Group Box ──────────────────────────────────────────────── */
@@ -181,6 +230,29 @@ QGroupBox::title {
     left: 12px;
     padding: 0 6px;
     background: #f5f5f5;
+}
+
+QGroupBox::indicator {
+    width: 16px;
+    height: 16px;
+    border: 2px solid #999999;
+    border-radius: 3px;
+    background: white;
+}
+
+QGroupBox::indicator:hover {
+    border: 2px solid #1a73e8;
+}
+
+QGroupBox::indicator:checked {
+    background: #1a73e8;
+    border: 2px solid #1a73e8;
+    image: url(:/images/checkbox_checked.svg);
+}
+
+QGroupBox::indicator:disabled {
+    background: #e0e0e0;
+    border: 2px solid #cccccc;
 }
 
 /* ── Table / Tree / List ────────────────────────────────────── */
@@ -403,12 +475,12 @@ QTextBrowser a:hover {
 }
 
 /* ── Frame ──────────────────────────────────────────────────── */
-QFrame[frameShape="4"] { /* HLine */
+QFrame[frameShape="4"] {
     background: #d0d0d0;
     max-height: 1px;
 }
 
-QFrame[frameShape="5"] { /* VLine */
+QFrame[frameShape="5"] {
     background: #d0d0d0;
     max-width: 1px;
 }

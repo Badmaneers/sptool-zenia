@@ -18,6 +18,7 @@
 #include <QCheckBox>
 #include <QtGlobal>
 #include <QFileDialog>
+#include "FileDialogHelper.h"
 #include <QDir>
 #include <stdio.h>
 #include <set>
@@ -658,7 +659,7 @@ void ReadBackWidget::on_tableWidget_cellDoubleClicked(int row, int column)
 
     QString file_name = ui_->tableWidget->item(row,ColumnFile)->text();
 
-    file_name = QFileDialog::getSaveFileName(this,tr("Save File"), file_name);
+    file_name = FileDialogHelper::getSaveFileName(this,tr("Save File"), file_name);
     if(!file_name.isEmpty())
     {
         file_name = QDir::toNativeSeparators(file_name);

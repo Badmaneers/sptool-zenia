@@ -9,6 +9,7 @@
 
 #include <QFile>
 #include <QFileDialog>
+#include "FileDialogHelper.h"
 #include <QRegularExpressionValidator>
 
 WriteMemoryWidget::WriteMemoryWidget(QTabWidget *parent, MainWindow *window) :
@@ -166,7 +167,7 @@ void WriteMemoryWidget::on_toolButton_stop_clicked()
 
 void WriteMemoryWidget::on_toolButton_openFile_clicked()
 {
-    QString file_name = QFileDialog::getOpenFileName(
+    QString file_name = FileDialogHelper::getOpenFileName(
                 this,
                 tr("Open Raw Data File"),
                 FileUtils::GetAppDirectory().c_str(),

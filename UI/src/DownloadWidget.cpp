@@ -14,6 +14,7 @@
 
 #include <QtDebug>
 #include <QFileDialog>
+#include "FileDialogHelper.h"
 #include <QSettings>
 #include <QMessageBox>
 #include <algorithm>
@@ -109,7 +110,7 @@ void DownloadWidget::on_pushButton_downloadAgent_clicked()
     if(last_dir.isEmpty())
         last_dir = FileUtils::GetAppDirectory().c_str();
 
-    QString file_name = QFileDialog::getOpenFileName(
+    QString file_name = FileDialogHelper::getOpenFileName(
                 this,
                 LoadQString(LANGUAGE_TAG, IDS_STRING_OPEN_DA),
                 last_dir,
@@ -141,7 +142,7 @@ void DownloadWidget::on_pushButton_scatterLoading_clicked()
 
     QString last_dir = item.GetStringValue();
 
-    QString file_name = QFileDialog::getOpenFileName(
+    QString file_name = FileDialogHelper::getOpenFileName(
                 this,
                 LoadQString(LANGUAGE_TAG, IDS_STRING_OPEN_SCATTER),
                 last_dir,
@@ -214,7 +215,7 @@ void DownloadWidget::on_pushButton_authFile_clicked()
     IniItem item("history.ini", "RecentOpenFile", "lastAuthDir");
     QString last_dir = item.GetStringValue();
 
-    QString file_name = QFileDialog::getOpenFileName(
+    QString file_name = FileDialogHelper::getOpenFileName(
                 this,
                 LoadQString(LANGUAGE_TAG, IDS_STRING_OPEN_AUTHFILE),
                 last_dir,
@@ -275,7 +276,7 @@ void DownloadWidget::on_pushButton_CertFile_clicked()
     IniItem item("history.ini", "RecentOpenFile", "lastCertDir");
     QString last_dir = item.GetStringValue();
 
-    QString file_name = QFileDialog::getOpenFileName(
+    QString file_name = FileDialogHelper::getOpenFileName(
                 this,
                 LoadQString(LANGUAGE_TAG, IDS_STRING_OPEN_SECFILE),
                 last_dir,
@@ -1530,7 +1531,7 @@ int DownloadWidget::GetSecRoIndex()
 void DownloadWidget::choose_rom_file(int row)
 {
     QString file = ui_->tableWidget->item(row,ColumnLocation)->text();
-    QString new_file = QFileDialog::getOpenFileName(this, "Open File",
+    QString new_file = FileDialogHelper::getOpenFileName(this, "Open File",
                                         file, "All File (*.*)");
     if(!new_file.isEmpty())
     {

@@ -3,6 +3,7 @@
 
 #include <QDir>
 #include <QFileDialog>
+#include "FileDialogHelper.h"
 #include <QRegularExpressionValidator>
 #include "../../Logger/Log.h"
 #include "../../Utility/FileUtils.h"
@@ -84,7 +85,7 @@ std::string OTPReadDialog::get_otp_file()const
 
 void OTPReadDialog::on_pushButton_clicked()
 {
-    QString file_name = QFileDialog::getSaveFileName(
+    QString file_name = FileDialogHelper::getSaveFileName(
                 this,
                 LoadQString(lang_tag, IDS_STRING_SAVE_AS),
                 FileUtils::GetAppDirectory().c_str(),

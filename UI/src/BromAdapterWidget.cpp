@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <QSettings>
 #include <QFileDialog>
+#include "FileDialogHelper.h"
 #include <QRegularExpressionValidator>
 
 
@@ -183,7 +184,7 @@ void BromAdapterWidget::on_toolButton_stop_clicked()
 
 void BromAdapterWidget::on_pushButton_data_clicked()
 {
-    QString file_name = QFileDialog::getOpenFileName(
+    QString file_name = FileDialogHelper::getOpenFileName(
                 this,
                 LoadQString(LANGUAGE_TAG, IDS_STRING_OPEN_DOWNLOAD_DATA),
                 FileUtils::GetAppDirectory().c_str());

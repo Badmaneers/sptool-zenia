@@ -6,6 +6,7 @@
 #include "ICallback.h"
 #include "ProcessingDialog.h"
 #include <QFileDialog>
+#include "FileDialogHelper.h"
 #include "./Setting/PlatformSetting.h"
 #include "./Utility/IniItem.h"
 #include "ScatterObserver.h"
@@ -140,7 +141,7 @@ void SCIDownloadWidget::on_pushButton_SCIscatterLoading_clicked()
 
     QString last_dir = item.GetStringValue();
 
-    QString file_name = QFileDialog::getOpenFileName(this,
+    QString file_name = FileDialogHelper::getOpenFileName(this,
                                                      tr("Open SCI Scatter File"),
                                                      last_dir,
                                                      tr("Bin File (*.bin)"));

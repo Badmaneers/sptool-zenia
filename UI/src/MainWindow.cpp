@@ -55,6 +55,7 @@
 #include <QShowEvent>
 #include <QCloseEvent>
 #include <QFileDialog>
+#include "FileDialogHelper.h"
 #include <QSettings>
 #include <algorithm>
 
@@ -1710,7 +1711,7 @@ void MainWindow::on_actionExit_triggered()
 
 void MainWindow::on_actionExportFormat_triggered()
 {
-    QString file_name = QFileDialog::getSaveFileName(
+    QString file_name = FileDialogHelper::getSaveFileName(
                 this,"Save File", "format.xml", "*.xml");
     if(!file_name.isEmpty())
     {
@@ -1725,7 +1726,7 @@ void MainWindow::on_actionExportFormat_triggered()
 
 void MainWindow::on_actionExportDownload_triggered()
 {
-    QString file_name = QFileDialog::getSaveFileName(
+    QString file_name = FileDialogHelper::getSaveFileName(
                 this,"Save File", "download.xml", "*.xml");
     if(!file_name.isEmpty())
     {
@@ -1744,7 +1745,7 @@ void MainWindow::on_actionExportDownload_triggered()
 
 void MainWindow::on_actionCerfitication_download_triggered()
 {
-    QString file_name = QFileDialog::getSaveFileName(
+    QString file_name = FileDialogHelper::getSaveFileName(
                 this, "Save File", "certdl.xml", "*.xml");
 
     if(!file_name.isEmpty())
@@ -1792,7 +1793,7 @@ void MainWindow::slot_show_network_connected(bool connected)
 
 void MainWindow::on_actionExportPartial_Format_Download_triggered()
 {
-    QString file_name = QFileDialog::getSaveFileName(
+    QString file_name = FileDialogHelper::getSaveFileName(
                 this,"Save File", "format_download.xml", "*.xml");
     bool is_phy_fmt = IsPhysicalFmtandReadback();
 
@@ -1831,7 +1832,7 @@ void MainWindow::on_actionReadback_triggered()
                               LoadQString(language_tag, IDS_STRING_OK));
         return;
     }
-    QString file_name = QFileDialog::getSaveFileName(
+    QString file_name = FileDialogHelper::getSaveFileName(
                 this,"Save File", "readback.xml", "*.xml");
     if(!file_name.isEmpty())
     {
@@ -1841,7 +1842,7 @@ void MainWindow::on_actionReadback_triggered()
 
 void MainWindow::on_actionExportWriteMemory_triggered()
 {
-    QString file_name = QFileDialog::getSaveFileName(
+    QString file_name = FileDialogHelper::getSaveFileName(
                 this,"Save File", "write_memory.xml", "*.xml");
 
     if(!file_name.isEmpty())

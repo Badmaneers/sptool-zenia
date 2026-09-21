@@ -187,6 +187,29 @@ QGroupBox::title {
     background: #1e1e1e;
 }
 
+QGroupBox::indicator {
+    width: 16px;
+    height: 16px;
+    border: 2px solid #666666;
+    border-radius: 3px;
+    background: #3c3c3c;
+}
+
+QGroupBox::indicator:hover {
+    border: 2px solid #4fc3f7;
+}
+
+QGroupBox::indicator:checked {
+    background: #0e639c;
+    border: 2px solid #0e639c;
+    image: url(:/images/checkbox_checked.svg);
+}
+
+QGroupBox::indicator:disabled {
+    background: #2d2d2d;
+    border: 2px solid #444444;
+}
+
 /* ── Table / Tree / List ────────────────────────────────────── */
 QTableView, QTreeView, QListView {
     border: 1px solid #3c3c3c;
