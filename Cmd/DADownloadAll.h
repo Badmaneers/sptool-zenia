@@ -4,7 +4,7 @@
 #include "ICommand.h"
 #include "../Arg/BootRomArg.h"
 #include "../Arg/BromDownloadArg.h"
-#include <QTime>
+#include <QElapsedTimer>
 
 namespace APCore
 {
@@ -20,7 +20,7 @@ public:
 private:
     friend class DADownloadAllSetting;
     BromDownloadArg download_arg;
-    QTime download_clock;
+    QElapsedTimer download_clock;
 };
 
 }

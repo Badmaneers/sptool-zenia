@@ -4,8 +4,8 @@
 #include <QFileInfo>
 #include <QFileInfoList>
 #include <QPixmap>
-#include <QApplication>
-#include <QDesktopWidget>
+#include <QGuiApplication>
+#include <QScreen>
 #include "../UI/src/MainWindow.h"
 
 #include <QDebug>
@@ -54,6 +54,15 @@ void SendReport::sendErrorReport()
     isSendThread_running_ = true;
 
     startSend();
+}
+
+void SendReport::stopSendThread()
+{
+    if(sendThread_.isRunning())
+    {
+        sendThread_.quit();
+        sendThread_.wait();
+    }
 }
 
 void SendReport::startSend()
@@ -109,7 +118,8 @@ void SendReport::CaptureScreen()
 
     srcDir.cd(srcFileInfo.fileName());
 
-    QPixmap pic = QPixmap::grabWindow(QApplication::desktop()->winId());
+    QScreen *screen = QGuiApplication::primaryScreen();
+    QPixmap pic = screen ? screen->grabWindow(0) : QPixmap();
     QString screenFilePath = QString("%1/%2").arg(srcFileInfo.filePath()).arg(gConstScreenShotFileName);
 
     QFile file(screenFilePath);
@@ -124,7 +134,7 @@ void SendReport::releaseResources()
 {
     uint i;
 
-    qDebug()<<QString("releaseResources, threadID=%1").arg((uint)QThread::currentThreadId());
+    qDebug()<<QString("releaseResources, threadID=%1").arg((quintptr)QThread::currentThreadId());
 
     for(i=0 ; i<gConstMaxLogFileNumber ; i++)
     {

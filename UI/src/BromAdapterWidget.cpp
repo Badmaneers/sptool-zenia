@@ -12,6 +12,8 @@
 
 #include <stdio.h>
 #include <QSettings>
+#include <QFileDialog>
+#include <QRegularExpressionValidator>
 
 
 BromAdapterWidget::BromAdapterWidget(QTabWidget *parent, MainWindow *window) :
@@ -27,9 +29,9 @@ BromAdapterWidget::BromAdapterWidget(QTabWidget *parent, MainWindow *window) :
 {
     ui_->setupUi(this);
 
-    QRegExp regExpHex("0x[\\da-fA-F]{8}");
-    ui_->lineEdit_startAddress->setValidator(new QRegExpValidator(regExpHex, ui_->lineEdit_startAddress));
-    ui_->lineEdit_jumpAddress->setValidator(new QRegExpValidator(regExpHex, ui_->lineEdit_jumpAddress));
+    QRegularExpressionValidator *validator_hex = new QRegularExpressionValidator(QRegularExpression("0x[\\da-fA-F]{8}"), this);
+    ui_->lineEdit_startAddress->setValidator(validator_hex);
+    ui_->lineEdit_jumpAddress->setValidator(validator_hex);
 
 
     ui_->frame_jump->setVisible(false);

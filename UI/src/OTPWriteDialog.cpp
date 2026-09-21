@@ -4,6 +4,7 @@
 #include <QDir>
 #include <QFileDialog>
 #include <QTextCodec>
+#include <QRegularExpressionValidator>
 #include "../../Utility/FileUtils.h"
 #include "../../Logger/Log.h"
 #include "../../Host/Inc/RuntimeMemory.h"
@@ -18,10 +19,10 @@ OTPWriteDialog::OTPWriteDialog(QWidget *parent, Language_Tag tag) :
 
     setWindowTitle(tr("OTP Write Setting"));
 
-    QRegExp regExpHex("0x[\\da-fA-F]{8}");
-    QRegExp regExpHex16("0x[\\da-fA-F]{16}");
-    ui->le_otp_waddr->setValidator(new QRegExpValidator(regExpHex16, ui->le_otp_waddr));
-    ui->le_otp_wlen->setValidator(new QRegExpValidator(regExpHex, ui->le_otp_wlen));
+    QRegularExpressionValidator *validator_hex = new QRegularExpressionValidator(QRegularExpression("0x[\\da-fA-F]{8}"), this);
+    QRegularExpressionValidator *validator_hex16 = new QRegularExpressionValidator(QRegularExpression("0x[\\da-fA-F]{16}"), this);
+    ui->le_otp_waddr->setValidator(validator_hex16);
+    ui->le_otp_wlen->setValidator(validator_hex);
 
     ui->le_otp_waddr->setText("0x");
     ui->le_otp_wlen->setText("0x");
@@ -145,7 +146,7 @@ void OTPWriteDialog::on_pb_OTPfile_path_clicked()
         ui->le_OTPfile_path->setText(file_name);
 
         QString s = NULL;
-        s.sprintf("0x%08x", file_len);
+        s.asprintf("0x%08x", file_len);
         ui->le_otp_wlen->setText(s);
     }
 }

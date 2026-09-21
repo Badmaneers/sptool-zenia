@@ -14,6 +14,7 @@
 
 #include <QtDebug>
 #include <QtGui>
+#include <QFileDialog>
 #include <QTextCodec>
 #include <QRegExp>
 #include <algorithm>
@@ -61,7 +62,7 @@ DownloadWidget::DownloadWidget(QTabWidget *parent, MainWindow *window) :
     connect(this, SIGNAL(signal_load_rom_failed()), SLOT(slot_OnLoadRomFailed()));
     connect (main_window_->processing_dialog(), SIGNAL(user_cancel_processing()),this, SLOT(slot_OnUserCancelLoadScatter()));
 
-    ui_->tableWidget->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
+    ui_->tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
     main_window_->main_controller()->GetPlatformSetting()->addObserver(this);
     main_window_->scatter_observer()->addObserver(this);
@@ -1669,7 +1670,7 @@ void DownloadWidget::UpdateRomInfoList(Download_Scene scene)
     }
 }
 
-void DownloadWidget::on_comboBox_scatterFilePath_activated(const QString &arg1)
+void DownloadWidget::on_comboBox_scatterFilePath_textActivated(const QString &arg1)
 {
     QString file_name = arg1;
 

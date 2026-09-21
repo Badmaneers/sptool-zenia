@@ -74,9 +74,9 @@ bool EncryDialog::checkPassword()
     password_day += wDay;
     password_month += wMonth;
 
-    strPassword1_day.sprintf("%d", password_day);
-    strPassword1_week.sprintf("%d", password_week);
-    strPassword1_month.sprintf("%d", password_month);
+    strPassword1_day.asprintf("%d", password_day);
+    strPassword1_week.asprintf("%d", password_week);
+    strPassword1_month.asprintf("%d", password_month);
 
     password_day = wDay * 58942;
     if ((wDay > 0) && (wDay <= 10))
@@ -307,9 +307,9 @@ bool EncryDialog::checkPassword()
             password_c4_month +=25;
     }
 
-    strPassword2_day.sprintf("%c%c%c%c", password_c1_day, password_c2_day, password_c3_day, password_c4_day);
-    strPassword2_week.sprintf("%c%c%c%c", password_c1_week, password_c2_week, password_c3_week, password_c4_week);
-    strPassword2_month.sprintf("%c%c%c%c", password_c1_month, password_c2_month, password_c3_month, password_c4_month);
+    strPassword2_day.asprintf("%c%c%c%c", password_c1_day, password_c2_day, password_c3_day, password_c4_day);
+    strPassword2_week.asprintf("%c%c%c%c", password_c1_week, password_c2_week, password_c3_week, password_c4_week);
+    strPassword2_month.asprintf("%c%c%c%c", password_c1_month, password_c2_month, password_c3_month, password_c4_month);
 
     password_day = 2948201;
     password_week = 8138947;
@@ -327,9 +327,9 @@ bool EncryDialog::checkPassword()
     password_week = password_week >> 3;
     password_month = password_month >> 6;
 
-    strPassword3_day.sprintf("%d", password_day);
-    strPassword3_week.sprintf("%d", password_week);
-    strPassword3_month.sprintf("%d", password_month);
+    strPassword3_day.asprintf("%d", password_day);
+    strPassword3_week.asprintf("%d", password_week);
+    strPassword3_month.asprintf("%d", password_month);
 
     strPassword_day_ = strPassword1_day;
     strPassword_day_ += strPassword2_day;

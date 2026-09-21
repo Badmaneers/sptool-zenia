@@ -2,8 +2,10 @@
 #define SCHEMAVALIDATOR_H
 
 #include <QString>
-#include <QtXmlPatterns>
 #include <QFile>
+
+#include <xercesc/util/PlatformUtils.hpp>
+#include <xercesc/parsers/XercesDOMParser.hpp>
 
 #include "../Err/Exception.h"
 
@@ -25,7 +27,7 @@ private:
 
 private:
     QString schema_file;
-    QXmlSchema schema_obj;
+    xercesc::XercesDOMParser *schema_parser;
     MessageHandler *msg_handler;
 };
 

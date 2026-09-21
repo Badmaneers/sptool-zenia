@@ -5,6 +5,7 @@
 #include "CheckHeader.h"
 #include "ICallback.h"
 #include "ProcessingDialog.h"
+#include <QFileDialog>
 #include "./Setting/PlatformSetting.h"
 #include "./Utility/IniItem.h"
 #include "ScatterObserver.h"
@@ -22,7 +23,7 @@ SCIDownloadWidget::SCIDownloadWidget(QTabWidget* parent, MainWindow *window) :
     setAcceptDrops(true);
 
     ui->tableWidget->setHorizontalHeader(header_);
-    ui->tableWidget->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
+    ui->tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
     header_->SetChecked(true);
 

@@ -3,6 +3,7 @@
 
 #include "CoreHandle.h"
 #include <QtGlobal>
+#include <cstdlib>
 
 #if 0
 //a way of hash to generate integer according to the string
@@ -35,7 +36,7 @@ static int HashByString(const std::string & str)
 static int GenKey()
 {
     //TODO: generate a session id.
-    return qrand();
+    return rand();
 }
 
 namespace APCore

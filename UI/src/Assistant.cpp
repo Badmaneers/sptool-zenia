@@ -2,7 +2,7 @@
 #include <QLibraryInfo>
 #include <QDir>
 #include <QApplication>
-#include <QDesktopServices>
+#include <QStandardPaths>
 #include "MainWindow.h"
 #include "../../Utility/FileUtils.h"
 #include "../../Host/Inc/RuntimeMemory.h"
@@ -89,7 +89,7 @@ void Assistant::ShowDocumentation(const QString &page)
 }
 
 inline void Assistant::UpdateCacheDir(void) {
-    this->cache_dir_ = QDesktopServices::storageLocation(QDesktopServices::DataLocation)
+    this->cache_dir_ = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)
 #ifdef _WIN32
             + QString("\\Mediatek\\FlashTool");
 #else

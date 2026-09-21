@@ -7,6 +7,7 @@
 #include "../../Utility/constString.h"
 #include "../../Utility/Utils.h"
 #include "../../Host/Inc/RuntimeMemory.h"
+#include <QRegularExpressionValidator>
 
 static const int kMaxLength(18);
 const std::string FormatWidget::unsupport_fmt_other_chips[] = {"MT6739"};
@@ -52,10 +53,10 @@ void FormatWidget::InitDefault()
     //TODO(h):when nand flash && advanced mode, it should be visible.
     ui_->gb_ForamtEraseFlag->setVisible(isEraseFlagVisible);
 
-    QRegExp regExpHex("0x[\\da-fA-F]{16}");
+    QRegularExpressionValidator *validator_hex = new QRegularExpressionValidator(QRegularExpression("0x[\\da-fA-F]{16}"), this);
 
-    ui_->lineEdit_BeginAddress->setValidator(new QRegExpValidator(regExpHex, ui_->lineEdit_BeginAddress));
-    ui_->lineEdit_FormatLength->setValidator(new QRegExpValidator(regExpHex, ui_->lineEdit_FormatLength));
+    ui_->lineEdit_BeginAddress->setValidator(validator_hex);
+    ui_->lineEdit_FormatLength->setValidator(validator_hex);
 
     ui_->frame_ManualFormatSettings->setHidden(true);
     ui_->groupBox_auto_fmt->setHidden(false);
@@ -116,11 +117,11 @@ void FormatWidget::UpdateUI()
         platform_changed_ = false;
 
         ui_->lineEdit_BeginAddress->setMaxLength(kMaxLength);
-            addr_str.sprintf("0x%016llx", start_addr);
+            addr_str.asprintf("0x%016llx", start_addr);
             ui_->lineEdit_BeginAddress->setText(addr_str);
 
         ui_->lineEdit_FormatLength->setMaxLength(kMaxLength);
-            len_str.sprintf("0x%016llx", len);
+            len_str.asprintf("0x%016llx", len);
             ui_->lineEdit_FormatLength->setText(len_str);
 
         bool bSupportAutoFmtAll = main_window_->main_controller()->GetPlatformSetting()->getPlatformConfig().supportAutoFormatAll();

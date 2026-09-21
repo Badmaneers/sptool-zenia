@@ -2,7 +2,8 @@
 #include "MainWindow.h"
 #include "ui_WelcomeWidget.h"
 #include "../../Host/Inc/RuntimeMemory.h"
-#include <QtWebKit>
+
+#include <QUrl>
 
 WelcomeWidget::WelcomeWidget(QTabWidget *parent, MainWindow *window):
     TabWidgetBase(0, tr("W&elcome"), parent),
@@ -10,6 +11,7 @@ WelcomeWidget::WelcomeWidget(QTabWidget *parent, MainWindow *window):
     ui_(new Ui::WelcomeWidget)
 {
     ui_->setupUi(this);
+    ui_->webView->setSource(QUrl("qrc:/help/welcome.htm"));
 }
 
 WelcomeWidget::~WelcomeWidget()

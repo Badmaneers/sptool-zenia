@@ -130,6 +130,7 @@ public:
     void setChipID(uint chip);
     void setErrorID(uint error);
     void sendErrorReport();
+    void stopSendThread();
 
 signals:
     void stopTimer();

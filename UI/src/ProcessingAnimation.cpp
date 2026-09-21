@@ -1,7 +1,7 @@
 #include "ProcessingAnimation.h"
 
 #include <QtCore/QPoint>
-#include <QtGui/QApplication>
+#include <QApplication>
 #include <QtGui/QHideEvent>
 #include <QtGui/QPainter>
 #include <QtGui/QPaintEvent>
@@ -62,7 +62,7 @@ void ProcessingAnimation::paintEvent(QPaintEvent *event)
         if(m_animated)
             p.setBrush(colorForSegment(segment));
         else
-            p.setBrush(palette().background());
+            p.setBrush(palette().window());
         p.drawEllipse(QRect(displ, -ext / 2, ext, ext));
     }
 }

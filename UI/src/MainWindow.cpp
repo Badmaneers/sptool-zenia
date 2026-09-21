@@ -48,6 +48,7 @@
 
 #include <QtDebug>
 #include <QtGui>
+#include <QFileDialog>
 #include <algorithm>
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -132,7 +133,7 @@ void MainWindow::CreateWidget()
 {
     main_controller_ = new MainController(this,this);
     main_callbacks_ = new MainWindowCallback(this,this);
-    send_report_ = new SendReport(this, this);
+    send_report_ = new SendReport(NULL, this);
     thread_timer_ = new QTimer(this);
     thread_timer_->setSingleShot(true);
 
@@ -328,6 +329,7 @@ MainWindow::~MainWindow()
     }
     if(send_report_)
     {
+        send_report_->stopSendThread();
         delete send_report_;
         send_report_ = NULL;
     }
@@ -883,11 +885,11 @@ void MainWindow::setChipInfo(ChipInfoWidget *widget, const DA_REPORT_T *p_da_rep
 
 
     widget->setGeneralInfo(chip_name,
-                           chip_hw_ver.sprintf("0x%08x",p_da_report->m_bbchip_hw_ver),
+                           chip_hw_ver.asprintf("0x%08x",p_da_report->m_bbchip_hw_ver),
                            chip_ext_clock,
                            ram_type,
-                           ram_size.sprintf("0x%llx",p_da_report->m_ext_ram_size),
-                           sram_size.sprintf("0x%08x",p_da_report->m_int_sram_size)
+                           ram_size.asprintf("0x%llx",p_da_report->m_ext_ram_size),
+                           sram_size.asprintf("0x%08x",p_da_report->m_int_sram_size)
                            );
 }
 
@@ -916,9 +918,9 @@ void MainWindow::slot_GetDAReport(const DA_REPORT_T *p_da_report,
             ui->toolBox_status->addItem(nor_widget_, QIcon(":/images/writeMemory.png"), tr("Nor Flash"));
         }
 
-        nor_widget_->setNorFlashInfo(str[0].sprintf("0x%08x",p_da_report->m_nor_flash_id),
-                                    str[1].sprintf("0x%08x",p_da_report->m_nor_flash_size),
-                                    str[2].sprintf("0x%08x",p_da_report->m_nor_flash_otp_size));
+        nor_widget_->setNorFlashInfo(str[0].asprintf("0x%08x",p_da_report->m_nor_flash_id),
+                                    str[1].asprintf("0x%08x",p_da_report->m_nor_flash_size),
+                                    str[2].asprintf("0x%08x",p_da_report->m_nor_flash_otp_size));
     }
     else
     {
@@ -940,11 +942,11 @@ void MainWindow::slot_GetDAReport(const DA_REPORT_T *p_da_report,
             ui->toolBox_status->addItem(nand_widget_, QIcon(":/images/add.png"), tr("Nand Flash"));
         }
 
-        nand_widget_->setNandInfo(str[0].sprintf("0x%08x",p_da_report->m_nand_flash_id),
-                                 str[1].sprintf("0x%llX",p_da_report->m_nand_flash_size),
-                                 str[2].sprintf("0x%08x",p_da_report->m_nand_pagesize),
-                                 str[3].sprintf("0x%08x",p_da_report->m_nand_sparesize),
-                                 str[4].sprintf("0x%08x",p_da_report->m_nand_pages_per_block),
+        nand_widget_->setNandInfo(str[0].asprintf("0x%08x",p_da_report->m_nand_flash_id),
+                                 str[1].asprintf("0x%llX",p_da_report->m_nand_flash_size),
+                                 str[2].asprintf("0x%08x",p_da_report->m_nand_pagesize),
+                                 str[3].asprintf("0x%08x",p_da_report->m_nand_sparesize),
+                                 str[4].asprintf("0x%08x",p_da_report->m_nand_pages_per_block),
                                  p_da_report->m_nand_bmt_exist ? "true" : "false"
                                  );
     }
@@ -967,14 +969,14 @@ void MainWindow::slot_GetDAReport(const DA_REPORT_T *p_da_report,
              ui->toolBox_status->addItem(emmc_widget_, QIcon(":/images/setting.png"), tr("EMMC Flash"));
         }
 
-        emmc_widget_->setEmmcInfo(str[0].sprintf("0x%llx",p_da_report->m_emmc_boot1_size),
-                                 str[1].sprintf("0x%llx",p_da_report->m_emmc_boot2_size),
-                                 str[2].sprintf("0x%llx",p_da_report->m_emmc_rpmb_size),
-                                 str[3].sprintf("0x%llx",p_da_report->m_emmc_gp1_size),
-                                 str[4].sprintf("0x%llx",p_da_report->m_emmc_gp2_size),
-                                 str[5].sprintf("0x%llx",p_da_report->m_emmc_gp3_size),
-                                 str[6].sprintf("0x%llx",p_da_report->m_emmc_gp4_size),
-                                 str[7].sprintf("0x%llx",p_da_report->m_emmc_ua_size));
+        emmc_widget_->setEmmcInfo(str[0].asprintf("0x%llx",p_da_report->m_emmc_boot1_size),
+                                 str[1].asprintf("0x%llx",p_da_report->m_emmc_boot2_size),
+                                 str[2].asprintf("0x%llx",p_da_report->m_emmc_rpmb_size),
+                                 str[3].asprintf("0x%llx",p_da_report->m_emmc_gp1_size),
+                                 str[4].asprintf("0x%llx",p_da_report->m_emmc_gp2_size),
+                                 str[5].asprintf("0x%llx",p_da_report->m_emmc_gp3_size),
+                                 str[6].asprintf("0x%llx",p_da_report->m_emmc_gp4_size),
+                                 str[7].asprintf("0x%llx",p_da_report->m_emmc_ua_size));
     }
     else
     {
@@ -995,8 +997,8 @@ void MainWindow::slot_GetDAReport(const DA_REPORT_T *p_da_report,
             ui->toolBox_status->addItem(sdmmc_widget_, QIcon(":/images/update.png"), tr("SD Flash"));
         }
 
-        sdmmc_widget_->setSdmmcInfo(str[0].sprintf("0x%08x",p_da_report->m_sdmmc_cid[0]),
-                                str[1].sprintf("0x%llx",p_da_report->m_sdmmc_ua_size));
+        sdmmc_widget_->setSdmmcInfo(str[0].asprintf("0x%08x",p_da_report->m_sdmmc_cid[0]),
+                                str[1].asprintf("0x%llx",p_da_report->m_sdmmc_ua_size));
     }
     else
     {
@@ -1017,10 +1019,10 @@ void MainWindow::slot_GetDAReport(const DA_REPORT_T *p_da_report,
             ui->toolBox_status->addItem(ufs_widget_, QIcon(":/images/update.png"), tr("UFS Flash"));
         }
 
-        ufs_widget_->setUfsInfo(str[0].sprintf("0x%016llX",p_da_report->m_ufs_lu0_size),
-                                 str[1].sprintf("0x%016llX",p_da_report->m_ufs_lu1_size),
-                                 str[2].sprintf("0x%016llX",p_da_report->m_ufs_lu2_size)/*,
-                                 str[3].sprintf("0x%016llX",p_da_report->m_ufs_lu3_size)*/);
+        ufs_widget_->setUfsInfo(str[0].asprintf("0x%016llX",p_da_report->m_ufs_lu0_size),
+                                 str[1].asprintf("0x%016llX",p_da_report->m_ufs_lu1_size),
+                                 str[2].asprintf("0x%016llX",p_da_report->m_ufs_lu2_size)/*,
+                                 str[3].asprintf("0x%016llX",p_da_report->m_ufs_lu3_size)*/);
     }
     else
     {
@@ -1457,27 +1459,27 @@ void MainWindow::ResetStatus()
 void MainWindow::InitShortcuts()
 {
     mbadblock_shortcut = new QShortcut(this);
-    mbadblock_shortcut->setKey(Qt::CTRL+Qt::ALT+Qt::Key_B);
+    mbadblock_shortcut->setKey(QKeySequence(Qt::CTRL | Qt::ALT, Qt::Key_B));
     connect(mbadblock_shortcut, SIGNAL(activated()),this, SLOT(toggleEnableMarkBadBlockMode()));
 
     madvance_shortcut = new QShortcut(this);
-    madvance_shortcut->setKey(Qt::CTRL+Qt::ALT+Qt::Key_V);
+    madvance_shortcut->setKey(QKeySequence(Qt::CTRL | Qt::ALT, Qt::Key_V));
     connect(madvance_shortcut, SIGNAL(activated()), this, SLOT(toggleEnableAdvanceMode()));
 
     mbromAdapter_shortcut = new QShortcut(this);
-    mbromAdapter_shortcut->setKey(Qt::CTRL + Qt::ALT + Qt::Key_A);
+    mbromAdapter_shortcut->setKey(QKeySequence(Qt::CTRL | Qt::ALT, Qt::Key_A));
     connect(mbromAdapter_shortcut, SIGNAL(activated()), this, SLOT(toggleBromAdapterWidget()));
 
     mSCIDownload_shortcut = new QShortcut(this);
-    mSCIDownload_shortcut->setKey(Qt::CTRL + Qt::ALT + Qt::Key_L);
+    mSCIDownload_shortcut->setKey(QKeySequence(Qt::CTRL | Qt::ALT, Qt::Key_L));
     connect(mSCIDownload_shortcut, SIGNAL(activated()), this,SLOT(toggleSCIDownloadWidget()));
 
     mlogger_shortcut = new QShortcut(this);
-    mlogger_shortcut->setKey(Qt::CTRL + Qt::ALT + Qt::Key_M);
+    mlogger_shortcut->setKey(QKeySequence(Qt::CTRL | Qt::ALT, Qt::Key_M));
     connect(mlogger_shortcut,SIGNAL(activated()), this, SLOT(toggleLogging()));
 
     mDevTest_shortcut = new QShortcut(this);
-    mDevTest_shortcut->setKey(Qt::CTRL + Qt::ALT + Qt::Key_D);
+    mDevTest_shortcut->setKey(QKeySequence(Qt::CTRL | Qt::ALT, Qt::Key_D));
     connect(mDevTest_shortcut, SIGNAL(activated()), this,SLOT(toggleDeviceTestWidget()));
 }
 

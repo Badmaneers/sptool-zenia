@@ -127,9 +127,10 @@ inline void SetTextCodec(void) {
 #else
     QTextCodec *coder = QTextCodec::codecForName("UTF-8");
 #endif
-    QTextCodec::setCodecForTr(coder);
-    QTextCodec::setCodecForLocale(coder);
-    QTextCodec::setCodecForCStrings(coder);
+    if(coder)
+    {
+        QTextCodec::setCodecForLocale(coder);
+    }
 }
 
 inline QTextCodec * GetTextCodec(void) {

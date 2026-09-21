@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <QString>
 #include <QStringList>
+#include <QRegExp>
 #include <algorithm>
 #include <cctype>
 #include "../Utility/FileUtils.h"

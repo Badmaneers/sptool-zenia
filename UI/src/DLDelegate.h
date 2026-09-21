@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QtGui>
+#include <QtWidgets/QTableWidget>
 #include "TabWidgetBase.h"
 #include "../../Public/AppTypes.h"
 #include "../../Utility/Utils.h"

@@ -5,6 +5,7 @@
 #include "ICallback.h"
 #include <QFile>
 #include <QFileDialog>
+#include <QRegularExpressionValidator>
 
 FW::FW(QTabWidget *parent, MainWindow *window) :
     TabWidgetBase(11, tr("Firmware Udpate"), parent),
@@ -14,9 +15,9 @@ FW::FW(QTabWidget *parent, MainWindow *window) :
 {
     ui->setupUi(this);
 
-    QRegExp regExpHex("0x[\\da-fA-F]{16}");
-    ui->lineEdit_TWSize->setValidator(new QRegExpValidator(regExpHex, ui->lineEdit_TWSize));
-    ui->lineEdit_HPBSize->setValidator(new QRegExpValidator(regExpHex, ui->lineEdit_HPBSize));
+    QRegularExpressionValidator *validator_hex = new QRegularExpressionValidator(QRegularExpression("0x[\\da-fA-F]{16}"), this);
+    ui->lineEdit_TWSize->setValidator(validator_hex);
+    ui->lineEdit_HPBSize->setValidator(validator_hex);
 }
 
 FW::~FW()

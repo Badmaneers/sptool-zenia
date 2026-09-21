@@ -4,7 +4,7 @@ CheckHeader::CheckHeader(Qt::Orientation orientation, QWidget *parent) :
     QHeaderView(orientation, parent),
     ischecked_(false)
 {
-    setClickable(true);
+    setSectionsClickable(true);
     setStretchLastSection(true);
 
     setStyleSheet("QHeaderView::section {background-color:rgba(170,170,255, 50%);}");

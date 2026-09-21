@@ -6,7 +6,7 @@
 
 #include "../Logger/Log.h"
 #include <QCoreApplication>
-#include <QTime>
+#include <QElapsedTimer>
 
 namespace APCore
 {
@@ -91,7 +91,7 @@ void DeviceTestCommand::BatteryTestAndSleep(const QSharedPointer<Connection> &co
 
         conn->Disconnect();
 
-        QTime time;
+        QElapsedTimer time;
         time.start();
         while(time.elapsed() < 500)
         {
@@ -117,7 +117,7 @@ void DeviceTestCommand::GetVoltage(FLASHTOOL_API_HANDLE_T ft_handle)
     }
     else if ( ret == S_DONE)
     {
-        UpdateUI(QString().sprintf("Battery Voltage is %d\n", bt_result.bat_voltage_value), Qt::darkBlue);
+        UpdateUI(QString().asprintf("Battery Voltage is %d\n", bt_result.bat_voltage_value), Qt::darkBlue);
     }
     else
     {

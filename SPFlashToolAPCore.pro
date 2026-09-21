@@ -4,8 +4,7 @@
 #QT += core
 #QT -= gui
 TARGET = flash_tool
-QT    += xmlpatterns
-QT += webkit network
+QT += core5compat widgets network
 #QT += testlib
 
 # CONFIG   += console
@@ -13,11 +12,11 @@ QT += webkit network
 DEFINES += QT_NO_CAST_FROM_CAST
 TRANSLATIONS +=Flashtool_en.ts Flashtool_zh_CN.ts Flashtool_zh_TW.ts
 TEMPLATE = app
-win32:RELEASE_LIBRARY_FILES += $$PWD/Lib/*.lib $$PWD/lib/*.dll $$PWD/Lib/QtWin/*.lib $$PWD/lib/QtWin/*.dll
-unix:RELEASE_LIBRARY_FILES += $$PWD/Lib/*.so* $$PWD/Lib/QtLinux/*.so*
+win32:RELEASE_LIBRARY_FILES += $$PWD/lib/*.lib $$PWD/lib/*.dll $$PWD/lib/qtwin/*.lib $$PWD/lib/qtwin/*.dll
+unix:RELEASE_LIBRARY_FILES += $$PWD/lib/*.so* $$PWD/lib/qtlinux/*.so*
 win32:TARGET_FILE = $$quote($$OUT_PWD)/release/flash_tool.exe
 unix:TARGET_FILE += $$quote($$OUT_PWD)/flash_tool
-MISC_FILES = $$PWD/Lib/*.xml $$PWD/Lib/*.bin $$PWD/*.sh $$PWD/Lib/*.xsd
+MISC_FILES = $$PWD/lib/*.xml $$PWD/lib/*.bin $$PWD/*.sh $$PWD/lib/*.xsd
 # copy command in windows cannot support c:/xxx/xxx/xxx and only support c:\xxx\xxx\xxx
 win32:MISC_FILES = $$replace(MISC_FILES, /, \\)
 win32:RELEASE_LIBRARY_FILES = $$replace(RELEASE_LIBRARY_FILES, /, \\)
@@ -33,23 +32,24 @@ win32:{
 }
 unix:{
     DEFINES += "_LINUX"
-    QMAKE_LFLAGS += -Wl,-rpath,.
-    QMAKE_LFLAGS += -Wl,-rpath,lib
-    QMAKE_LFLAGS += -Wl,-rpath,qt
+    QMAKE_RPATHDIR += $ORIGIN
+    QMAKE_RPATHDIR += $ORIGIN/lib
+    QMAKE_RPATHDIR += $ORIGIN/lib/qtlinux/lib
 }
 
 win32:LIBS += -L$$quote($$PWD/lib) \
-    -L$$quote($$PWD/lib/QtWin) \
+    -L$$quote($$PWD/lib/qtwin) \
     -lFlashToolLib \
     -lFlashtoollibEx \
     -lSLA_Challenge \
     -lshell32
 
-unix:LIBS += -L$$quote($$PWD/Lib) \
-    -L$$quote($$PWD/Lib/QtLinux) \
+unix:LIBS += -L$$quote($$PWD/lib) \
+    -L$$quote($$PWD/lib/qtlinux) \
     -lflashtool \
     -lflashtoolEx \
-    -lsla_challenge
+    -lsla_challenge \
+    -lxerces-c
 
 SOURCES += \
     Conn/Connection.cpp \
@@ -480,7 +480,7 @@ linux:HEADERS += Linux/WINDEF.H \
     Linux/linux_flash_tool.h \
     Host/Linux/DeviceScan.h
 
-OTHER_FILES += Lib/FlashToolLib.lib \
+OTHER_FILES += lib/FlashToolLib.lib \
     Rules/image_map.xml
 
 FORMS += \

@@ -52,8 +52,8 @@ void AboutDialog::UpdateVersionInfo()
     DA_INFO da_info;
     if(main_window->main_controller()->GetDAInfo(&da_info))
     {
-        ui->label_DA->setText(QString().sprintf("DA_v%s",da_info.version));
-        ui->label_DA_Build_Date->setText(LoadQString(main_window->GetLanguageTag(), IDS_STRING_BUILD_DATE) + QString().sprintf("%s", da_info.last_modified_date));
+        ui->label_DA->setText(QString().asprintf("DA_v%s",da_info.version));
+        ui->label_DA_Build_Date->setText(LoadQString(main_window->GetLanguageTag(), IDS_STRING_BUILD_DATE) + QString().asprintf("%s", da_info.last_modified_date));
     }
     else
     {
@@ -67,9 +67,9 @@ void AboutDialog::UpdateVersionInfo()
     const char *p_build_date   = NULL;
 
     Brom_GetDLLInfo(&p_version,&p_release_type,&p_build_date,NULL);
-    ui->label_Brom->setText(QString().sprintf("libflashtool.so v%s",p_version));
+    ui->label_Brom->setText(QString().asprintf("libflashtool.so v%s",p_version));
     ui->label_Brom_Release_Type->setText(p_release_type);
-    ui->label_Brom_Build_Date->setText(LoadQString(main_window->GetLanguageTag(), IDS_STRING_BUILD_DATE) + QString().sprintf("%s", p_build_date));
+    ui->label_Brom_Build_Date->setText(LoadQString(main_window->GetLanguageTag(), IDS_STRING_BUILD_DATE) + QString().asprintf("%s", p_build_date));
 }
 
 void AboutDialog::UpdateUI()

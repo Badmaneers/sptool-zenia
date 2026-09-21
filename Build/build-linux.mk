@@ -15,19 +15,19 @@ QtFlashTool.SRC.Path          := $(PWD)
 
 # Dependent files
 QtFlashTool.Dependency.Files := \
- $(wildcard Lib/*.xml) \
- $(wildcard Lib/*.xsd) \
- $(wildcard Lib/*.ini) \
- $(wildcard Lib/*.so)  \
- $(wildcard Lib/*.bin) \
- $(wildcard Lib/*.sh) \
- $(wildcard Lib/*.qhc) \
- $(wildcard Lib/*.qch) \
- $(wildcard Lib/Release.json) \
- $(wildcard Lib/99-ttyacms.rules) \
+ $(wildcard lib/*.xml) \
+ $(wildcard lib/*.xsd) \
+ $(wildcard lib/*.ini) \
+ $(wildcard lib/*.so)  \
+ $(wildcard lib/*.bin) \
+ $(wildcard lib/*.sh) \
+ $(wildcard lib/*.qhc) \
+ $(wildcard lib/*.qch) \
+ $(wildcard lib/Release.json) \
+ $(wildcard lib/99-ttyacms.rules) \
 
 QtFlashTool.Dependency.Dirs := \
- $(wildcard Lib/QtLinux/*)
+ $(wildcard lib/qtlinux/*)
 
 QtFlashTool.Output.Files := *.xml *.xsd *.ini *.so *.bin *.sh *.qhc *.qch *.txt \
 	flash_tool 99-ttyacms.rules Release.json \

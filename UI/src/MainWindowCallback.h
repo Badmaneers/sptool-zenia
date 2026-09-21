@@ -2,7 +2,7 @@
 #define MAINWINDOWCALLBACK_H
 
 #include <QObject>
-#include <QTime>
+#include <QElapsedTimer>
 #include <QTimer>
 #include <QColor>
 
@@ -27,8 +27,8 @@ public:
     ~MainWindowCallback();
 
 private:
-    QTime speed_clock;
-    QTime start_clock;
+    QElapsedTimer speed_clock;
+    QElapsedTimer start_clock;
     QTimer *time_label_timer;
 
     MainWindow *main_window;

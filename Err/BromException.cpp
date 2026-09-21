@@ -27,7 +27,7 @@ BromException::~BromException() throw()
 std::string BromException::err_msg() const
 {
     char buff[512] = {0};
-    switch(err_code_)
+    switch(static_cast<unsigned int>(err_code_))
     {
     case S_STORAGE_NOT_MATCH:
     case S_CHIP_TYPE_NOT_MATCH:

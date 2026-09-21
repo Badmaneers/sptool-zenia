@@ -2,6 +2,7 @@
 #define NETWORKOPS_H
 
 #include <QSharedPointer>
+#include <QObject>
 
 class QNetworkAccessManager;
 class QNetworkReply;

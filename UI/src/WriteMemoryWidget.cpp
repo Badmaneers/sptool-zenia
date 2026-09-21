@@ -8,6 +8,8 @@
 #include "../../Host/Inc/RuntimeMemory.h"
 
 #include <QFile>
+#include <QFileDialog>
+#include <QRegularExpressionValidator>
 
 WriteMemoryWidget::WriteMemoryWidget(QTabWidget *parent, MainWindow *window) :
     TabWidgetBase(5, tr("Write &Memory"), parent),
@@ -17,8 +19,7 @@ WriteMemoryWidget::WriteMemoryWidget(QTabWidget *parent, MainWindow *window) :
 {
     ui_->setupUi(this);
 
-    QRegExp regExpHex("0x[\\da-fA-F]{16}");
-    ui_->lineEdit_address->setValidator(new QRegExpValidator(regExpHex, ui_->lineEdit_address));
+    ui_->lineEdit_address->setValidator(new QRegularExpressionValidator(QRegularExpression("0x[\\da-fA-F]{16}"), ui_->lineEdit_address));
 
     main_window_->scatter_observer()->addObserver(this);
 

@@ -7,6 +7,7 @@
 #include "../../Utility/constString.h"
 #include "../../Host/Inc/RuntimeMemory.h"
 #include "../../BootRom/internal_api.h"
+#include <QRegularExpressionValidator>
 
 MemoryTestWidget::MemoryTestWidget(QTabWidget *parent, MainWindow *window) :
     TabWidgetBase(4, tr("Memory&Test"), parent),
@@ -25,15 +26,15 @@ MemoryTestWidget::MemoryTestWidget(QTabWidget *parent, MainWindow *window) :
             this, SLOT(slot_MemoryTestRepairCallback(int)));
     connect(this,SIGNAL(signal_dram_repair_finished()),SLOT(slot_dram_repair_finished()));
 
-    QRegExp regExpHex("0x[\\da-fA-F]{16}");
+    QRegularExpressionValidator *validator_hex = new QRegularExpressionValidator(QRegularExpression("0x[\\da-fA-F]{16}"), this);
+    QRegularExpressionValidator *validator_dec = new QRegularExpressionValidator(QRegularExpression("[\\d]{16}"), this);
 
-    ui_->lineEdit_address->setValidator(new QRegExpValidator(regExpHex, ui_->lineEdit_address));
-    ui_->lineEdit_length->setValidator(new QRegExpValidator(regExpHex, ui_->lineEdit_length));
+    ui_->lineEdit_address->setValidator(validator_hex);
+    ui_->lineEdit_length->setValidator(validator_hex);
 
-    ui_->lineEdit_dramtest_address->setValidator(new QRegExpValidator(regExpHex, ui_->lineEdit_dramtest_address));
-    ui_->lineEdit_dramtest_length->setValidator(new QRegExpValidator(regExpHex, ui_->lineEdit_dramtest_length));
-    QRegExp regExpDec("[\\d]{16}");
-    ui_->lineEdit_dramtest_stresscount->setValidator(new QRegExpValidator(regExpDec, ui_->lineEdit_dramtest_stresscount));
+    ui_->lineEdit_dramtest_address->setValidator(validator_hex);
+    ui_->lineEdit_dramtest_length->setValidator(validator_hex);
+    ui_->lineEdit_dramtest_stresscount->setValidator(validator_dec);
 
     mEmmcRegionList << "EMMC_BOOT_1" << "EMMC_BOOT_2" << "EMMC_USER";
     mUfsEmmcRegionList << "BOOT_1" << "BOOT_2" << "USER";

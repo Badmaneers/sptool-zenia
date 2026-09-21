@@ -914,7 +914,7 @@ string ErrorLookup::FlashToolErrorMessage(FLASH_TOOL_RESULT ret) {
             prefix.append(buf);
     }
 
-    switch (ret) {
+    switch ((unsigned int)ret) {
         case FT_EXCEPTION:
             errMsg = "[SP Flash Tool] Common Error!";
             tipMsg = "SP Flash Tool common error.";

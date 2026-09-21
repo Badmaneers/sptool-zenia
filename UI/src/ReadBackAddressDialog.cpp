@@ -218,12 +218,12 @@ void ReadBackAddressDialog::onDecToHex()
 
     QString addr_str;
 
-         addr_str.sprintf("0x%016llx", addr);
+         addr_str.asprintf("0x%016llx", addr);
     
     ui->lineEdit_startAddress->setText(addr_str);
 
     QString len_str;
-    len_str.sprintf("0x%016llx", len);
+    len_str.asprintf("0x%016llx", len);
     ui->lineEdit_length->setText(len_str);
 }
 

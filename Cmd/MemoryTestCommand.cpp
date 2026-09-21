@@ -23,19 +23,19 @@ int __stdcall MemoryTestCommand::cb_memorytest_progress(
     {
         if(mt_arg->m_test_method == HW_MEM_DATA_BUS_TEST)
         {
-            instance->UpdateUI(QString().sprintf("[D%d]",progress));
+            instance->UpdateUI(QString().asprintf("[D%d]",progress));
         }
         else if(mt_arg->m_test_method == HW_MEM_ADDR_BUS_TEST)
         {
-            instance->UpdateUI(QString().sprintf("[A%d]",progress));
+            instance->UpdateUI(QString().asprintf("[A%d]",progress));
         }
         else if(mt_arg->m_test_method == HW_MEM_PATTERN_TEST)
         {
-          //  instance->UpdateUI(QString().sprintf("(0x%08X)",progress));
+          //  instance->UpdateUI(QString().asprintf("(0x%08X)",progress));
         }
         else if(mt_arg->m_test_method == HW_MEM_DRAM_FLIP_TEST)
         {
-            instance->UpdateUI(QString().sprintf("[FLIP]%d%%\thave test offset: 0x%08X", progress, finished_bytes));
+            instance->UpdateUI(QString().asprintf("[FLIP]%d%%\thave test offset: 0x%08X", progress, finished_bytes));
         }
     }
     return 0;
@@ -503,7 +503,7 @@ int MemoryTestCommand::RAMPatternTest(FlashTool_MemoryTest_Arg *mt_arg,
 
     for ( int i = 0 ; i < pattern_size ; i++ )
     {
-        UpdateUI(msg.sprintf("\t0x%08X, ", pattern_set[i]),  Qt::black);
+        UpdateUI(msg.asprintf("\t0x%08X, ", pattern_set[i]),  Qt::black);
         ret = RAMOnePatternTest( mt_arg, mt_result, pattern_set[i], da_report, ft_handle);
         if(ret != S_DONE)
         {

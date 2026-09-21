@@ -63,7 +63,7 @@ ReadBackWidget::ReadBackWidget(QTabWidget *parent, MainWindow *window) :
     ui_->tableWidget->setHorizontalHeader(m_header_);
     QObject::connect(m_header_,SIGNAL(sectionClicked(int)),
                      this, SLOT(slot_OnHeaderView_click(int)));
-    ui_->tableWidget->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
+    ui_->tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
     ShowRAMSelectBtn(false);
 }
 
@@ -179,14 +179,14 @@ void ReadBackWidget::UpdateReadBackItemsByScatter(bool scatter_ver2)
       }
       ui_->tableWidget->setItem(row, ColumnReadFlag, item);
       //set address
-      addr_str.sprintf("0x%016llx", it->begin_addr);
+      addr_str.asprintf("0x%016llx", it->begin_addr);
       LOG("item[%d].address:0x%llx", row , addr_str.data());
       item = new QTableWidgetItem(addr_str);
       item->setTextAlignment(Qt::AlignVCenter | Qt::AlignHCenter);
       ui_->tableWidget->setItem(row, ColumnAddr, item);
 
       //set partition length
-      len_str.sprintf("0x%016llx", it->partition_size);
+      len_str.asprintf("0x%016llx", it->partition_size);
       LOG("item[%d].length:%s",row, len_str.data());
       item = new QTableWidgetItem(len_str);
       item->setTextAlignment(Qt::AlignVCenter | Qt::AlignHCenter);
@@ -247,13 +247,13 @@ void ReadBackWidget::AppendOneReadBackRow(const ReadbackItem &readbackitem)
 
 
     QString sAddr;
-    sAddr.sprintf("0x%016llx", readbackitem.addr());
+    sAddr.asprintf("0x%016llx", readbackitem.addr());
     item = new QTableWidgetItem(sAddr);
     item->setTextAlignment(Qt::AlignVCenter | Qt::AlignHCenter);
     ui_->tableWidget->setItem(row, ColumnAddr, item);
 
     QString sLen;
-    sLen.sprintf("0x%016llx", readbackitem.len());
+    sLen.asprintf("0x%016llx", readbackitem.len());
     item = new QTableWidgetItem(sLen);
     item->setTextAlignment(Qt::AlignVCenter | Qt::AlignHCenter);
     ui_->tableWidget->setItem(row, ColumnLength, item);
@@ -631,7 +631,7 @@ NUTL_ReadFlag_E ReadBackWidget::ParseReadFlag(const QString &flag_str)
     }
     else
     {
-        LOG("Unknown read flag: %s",flag_str.constData()->toAscii());
+        LOG("Unknown read flag: %s",flag_str.toUtf8().constData());
         ret = NUTL_READ_FLAG_END;
         Q_ASSERT(0 && "unknown read flag");
     }
@@ -697,12 +697,12 @@ void ReadBackWidget::on_tableWidget_cellDoubleClicked(int row, int column)
                     ui_->tableWidget->item(row,ColumnReadFlag)->setText(read_flag_str);
                 }
 
-                addr_str.sprintf("0x%016llx", addr);
+                addr_str.asprintf("0x%016llx", addr);
      
                 ui_->tableWidget->item(row,ColumnAddr)->setText(addr_str);
 
                 QString len_str;
-                len_str.sprintf("0x%016llx",len);
+                len_str.asprintf("0x%016llx",len);
                 ui_->tableWidget->item(row,ColumnLength)->setText(len_str);
 
                 ui_->tableWidget->item(row, ColumnRegion)->setText(addr_dialog_->region());

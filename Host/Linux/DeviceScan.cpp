@@ -9,7 +9,7 @@
 #include <linux/netlink.h>
 #include <errno.h>
 #include <netinet/in.h>
-#include <QTime>
+#include <QElapsedTimer>
 
 #include "../../BootRom/brom.h"
 
@@ -259,7 +259,7 @@ bool DeviceScan::FindDeviceUSBPort(size_t ports_count, char *portName, int* p_st
     struct timeval tv;
     int ret, recvLen;
 
-    QTime time;
+    QElapsedTimer time;
     time.start();
 
     while(BOOT_STOP != (*p_stop_flag))
@@ -312,7 +312,7 @@ bool DeviceScan::FindSpecialDeviceUSBPort(size_t ports_count, const char *sPrefe
     struct timeval tv;
     int ret, recvLen;
 
-    QTime time;
+    QElapsedTimer time;
     time.start();
 
     while(BOOT_STOP != (*p_stop_flag))

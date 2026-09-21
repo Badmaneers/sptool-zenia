@@ -3,6 +3,7 @@
 
 #include <QDir>
 #include <QFileDialog>
+#include <QRegularExpressionValidator>
 #include "../../Logger/Log.h"
 #include "../../Utility/FileUtils.h"
 #include "../../Host/Inc/RuntimeMemory.h"
@@ -16,10 +17,10 @@ OTPReadDialog::OTPReadDialog(QWidget *parent,Language_Tag _tag) :
 
     setWindowTitle(tr("OTP Read Setting"));
 
-    QRegExp regExpHex("0x[\\da-fA-F]{8}");
-    QRegExp regExpHex16("0x[\\da-fA-F]{16}");
-    ui->lineEdit_OTP_addr->setValidator(new QRegExpValidator(regExpHex16, ui->lineEdit_OTP_addr));
-    ui->lineEdit_OTP_len->setValidator(new QRegExpValidator(regExpHex, ui->lineEdit_OTP_len));
+    QRegularExpressionValidator *validator_hex = new QRegularExpressionValidator(QRegularExpression("0x[\\da-fA-F]{8}"), this);
+    QRegularExpressionValidator *validator_hex16 = new QRegularExpressionValidator(QRegularExpression("0x[\\da-fA-F]{16}"), this);
+    ui->lineEdit_OTP_addr->setValidator(validator_hex16);
+    ui->lineEdit_OTP_len->setValidator(validator_hex);
 
     ui->lineEdit_OTP_addr->setText("0x");
     ui->lineEdit_OTP_len->setText("0x");

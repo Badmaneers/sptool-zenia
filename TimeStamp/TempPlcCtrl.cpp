@@ -115,15 +115,15 @@ void TempPlcCtrl::setHasExpiredBefore(const bool expired)
 
 QString TempPlcCtrl::encrypt(const QString & _Src)
 {
-    QByteArray src = _Src.toAscii();
-    QByteArray key = KEY.toAscii();
+    QByteArray src = _Src.toLatin1();
+    QByteArray key = KEY.toLatin1();
     int size = src.size() < key.size() ? src.size() : key.size();
     QByteArray des = src;
     for (int i = 0; i < size; ++i)
     {
         des[i] = src[i]^key[i];
     }
-    QString _Des = QString::fromAscii(des);
+    QString _Des = QString::fromLatin1(des);
     LOG("Encrypt result: %s", _Des.toStdString().c_str());
 
     return _Des;

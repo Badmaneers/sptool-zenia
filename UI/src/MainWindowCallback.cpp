@@ -408,7 +408,7 @@ void MainWindowCallback::slot_OperationOK()
 
     if(!isFinished && !main_window->main_controller()->is_stop_by_user())
     {
-        QTime time;
+        QElapsedTimer time;
         time.start();
         LOGD("wait 1s start!");
         while(time.elapsed()<1000)
@@ -719,7 +719,7 @@ void MainWindowCallback::slot_ReadbackInit(HW_StorageType_E storage,
             tip.append("storage:UNKNOWN,");
             break;
         }
-        tip.append(QString().sprintf("addr:0x%llx, len:0x%llx, file:%s",
+        tip.append(QString().asprintf("addr:0x%llx, len:0x%llx, file:%s",
                                      rb_addr, rb_len, file));
 
         main_window->ui->progressBar->setToolTip(tip);

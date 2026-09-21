@@ -9,6 +9,7 @@
 #include <QSharedPointer>
 #include <list>
 #include <QtGui>
+#include <QtWidgets/QTableWidgetItem>
 #include <QStringList>
 #include <QMap>
 #include <QPair>
@@ -198,7 +199,7 @@ private slots:
     void slot_OnHeaderView_click(int index);
     void slot_start_download();
 
-    void on_comboBox_scatterFilePath_activated(const QString &arg1);
+    void on_comboBox_scatterFilePath_textActivated(const QString &arg1);
     void on_pushButton_CertFile_clicked();
     void on_pushButton_authFile_clicked();
     void on_comboBox_Scene_activated(int index);

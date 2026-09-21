@@ -3,6 +3,7 @@
 #include "MainWindow.h"
 #include "MainController.h"
 #include "ICallback.h"
+#include <QFileDialog>
 #include "./Utility/IniItem.h"
 
 CloneDownloadWidget::CloneDownloadWidget(QTabWidget *parent, MainWindow *window) :

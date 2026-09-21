@@ -90,7 +90,7 @@ void ParameterWidget::on_OTPSettingBtn_clicked()
         {
             QString str = QString::fromLocal8Bit((otp_write_dialog_->get_otp_file()).c_str());
             QString ss;
-            ss.sprintf("addr(0x%08X), len(0x%08X), ",
+            ss.asprintf("addr(0x%08X), len(0x%08X), ",
                        otp_write_dialog_->get_otp_addr(),
                        otp_write_dialog_->get_otp_len());
             ss.append(str);
@@ -106,7 +106,7 @@ void ParameterWidget::on_OTPSettingBtn_clicked()
           {
              QString str = QString::fromLocal8Bit((otp_read_dialog_->get_otp_file()).c_str());
              QString ss;
-             ss.sprintf("addr(0x%08X), len(0x%08X), ",
+             ss.asprintf("addr(0x%08X), len(0x%08X), ",
                          otp_read_dialog_->get_otp_addr(),
                          otp_read_dialog_->get_otp_len());
              ss.append(str);

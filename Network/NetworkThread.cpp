@@ -40,7 +40,7 @@ QByteArray NetworkThread::getPostData() const
     QByteArray dataArray;
     QDateTime utc_datetime = QDateTime::currentDateTimeUtc();
     utc_datetime.setTimeSpec(Qt::UTC);
-    dataArray.append(QString::fromUtf8("record_date=%1&").arg(utc_datetime.toString("yyyy-MM-ddTHH:mm:ssZ")));
-    dataArray.append(QString::fromUtf8("storage_uid=%1").arg(m_device_id));
+    dataArray.append(QString::fromUtf8("record_date=%1&").arg(utc_datetime.toString("yyyy-MM-ddTHH:mm:ssZ")).toUtf8());
+    dataArray.append(QString::fromUtf8("storage_uid=%1").arg(m_device_id).toUtf8());
     return dataArray;
 }
