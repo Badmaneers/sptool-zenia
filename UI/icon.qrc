@@ -204,5 +204,6 @@
         <file>help/images/dbg003.png</file>
         <file>images/dramrepair.png</file>
         <file>style.qss</file>
+        <file>style-dark.qss</file>
     </qresource>
 </RCC>

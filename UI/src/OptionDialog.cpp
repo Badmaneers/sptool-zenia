@@ -851,36 +851,34 @@ void OptionDialog::on_comboBoxTheme_currentIndexChanged(int index)
         main_window_->setStyleSheet("");
         switch(index) {
         case 0: QApplication::setStyle(QStyleFactory::create("fusion")); break;
-        case 1: QApplication::setStyle(QStyleFactory::create("windows")); break;
-        case 2: QApplication::setStyle(QStyleFactory::create("windowsvista")); break;
-        case 3: QApplication::setStyle(QStyleFactory::create("fusion")); break;
-        case 5:
+        case 1:
             QApplication::setStyle(QStyleFactory::create("fusion"));
-            QFile stylesheet(":/style.qss");
-            if (stylesheet.open(QIODevice::ReadOnly | QIODevice::Text)) {
-                main_window_->setStyleSheet(stylesheet.readAll());
-                stylesheet.close();
-            }
+            loadDarkTheme();
+            break;
+        case 2: QApplication::setStyle(QStyleFactory::create("windows")); break;
+        case 3: QApplication::setStyle(QStyleFactory::create("windowsvista")); break;
+        case 5: QApplication::setStyle(QStyleFactory::create("fusion")); break;
+        case 6:
+            QApplication::setStyle(QStyleFactory::create("fusion"));
             ShowCustomThemeSetting(true);
             break;
         }
     }
 #else
-    if(index == 2) {
+    if(index == 3) {
         main_window_->setStyleSheet("background-image:url(:/images/background.jpg);");
         QApplication::setStyle(QStyleFactory::create("fusion"));
     } else {
         main_window_->setStyleSheet("");
         switch(index) {
         case 0: QApplication::setStyle(QStyleFactory::create("fusion")); break;
-        case 1: QApplication::setStyle(QStyleFactory::create("fusion")); break;
-        case 3:
+        case 1:
             QApplication::setStyle(QStyleFactory::create("fusion"));
-            QFile stylesheet(":/style.qss");
-            if (stylesheet.open(QIODevice::ReadOnly | QIODevice::Text)) {
-                main_window_->setStyleSheet(stylesheet.readAll());
-                stylesheet.close();
-            }
+            loadDarkTheme();
+            break;
+        case 2: QApplication::setStyle(QStyleFactory::create("fusion")); break;
+        case 4:
+            QApplication::setStyle(QStyleFactory::create("fusion"));
             ShowCustomThemeSetting(true);
             break;
         }
@@ -888,18 +886,27 @@ void OptionDialog::on_comboBoxTheme_currentIndexChanged(int index)
 #endif
 }
 
+void OptionDialog::loadDarkTheme()
+{
+    QFile stylesheet(":/style-dark.qss");
+    if (stylesheet.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        main_window_->setStyleSheet(stylesheet.readAll());
+        stylesheet.close();
+    }
+}
+
 void OptionDialog::InitThemeItems()
 {
     QStringList itemList;
 
 #ifdef _WIN32
-    itemList << "Modern (Default)" << "Windows Classic"
-             << "Windows Vista"
-             << "Plastique" << "Classic"
-             << "Custom (QSS)";
-#else
-    itemList << "Modern (Default)" << "Fusion"
+    itemList << "Modern (Default)" << "Dark Mode"
+             << "Windows Classic" << "Windows Vista"
              << "Classic"
+             << "Fusion" << "Custom (QSS)";
+#else
+    itemList << "Modern (Default)" << "Dark Mode"
+             << "Fusion" << "Classic"
              << "Custom (QSS)";
 #endif
 

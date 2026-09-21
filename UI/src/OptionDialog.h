@@ -89,6 +89,7 @@ private:
     void ReInitItems();
     void InitThemeItems();
     void ShowCustomThemeSetting(bool show);
+    void loadDarkTheme();
     void AdjustTime();
     void InitShortKeyTable();
 
