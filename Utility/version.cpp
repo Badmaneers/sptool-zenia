@@ -33,12 +33,13 @@ static const bool           TEMP_VER     = false;
 static const bool           DEFAULT_ENABLE_LOGS = true;
 
 static const unsigned int  MAJOR_VER        = 5;
-static const unsigned int  MINOR_VER        = 2228;
-static const unsigned int  BUILD_NUM        = 00;
-static const unsigned int  BUILD_SN         = 000;
+static const unsigned int  MINOR_VER        = 3;
+static const unsigned int  BUILD_NUM        = 0;
+static const unsigned int  BUILD_SN         = 0;
 //Note: REVISION_NUM is commit hash of the tool, should be HEX(0x...)
 static const unsigned int  REVISION_NUM     = 0x596975;
 static const char* const   BUILD_DATE       = __DATE__;
+static const char* const   VERSION_TAG      = "5.3-zenia";
 static const char* const   COMMENTS         = "Qt6 Linux port with dark mode, BROM shim, and modern UI";
 
 static const char* const   APP_NAME         = "SP Flash Tool for Linux";
@@ -71,10 +72,7 @@ bool ToolInfo::IsTempVer(){
 }
 
 std::string ToolInfo::ToolName() {
-    char toolName[256] = { 0 };
-    sprintf(toolName, "%s v%d.%d.0%d", APP_NAME, MAJOR_VER, MINOR_VER,
-            BUILD_NUM);
-    return std::string(toolName);
+    return std::string(APP_NAME) + " v" + VERSION_TAG;
 }
 
 std::string ToolInfo::BuildInfo() {
@@ -103,9 +101,5 @@ std::string ToolInfo::ToString() {
 
 std::string ToolInfo::VersionNum()
 {
-    char ver[20] = {0};
-
-    sprintf(ver, "%d.%d.0%d.sn%d", MAJOR_VER, MINOR_VER, BUILD_NUM, BUILD_SN);
-
-    return std::string(ver);
+    return std::string(VERSION_TAG);
 }
