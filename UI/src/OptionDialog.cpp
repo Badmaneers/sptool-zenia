@@ -366,10 +366,10 @@ void OptionDialog::LoadConnSettings()
 
     int conn_type = index;
 
-    if(index == APCore_Conn_BromUART )
-        ui->radioUART->setChecked(true);
-    else
+    if(index == APCore_Conn_BromUSB )
         ui->radioUSB->setChecked(true);
+    else
+        ui->radioUART->setChecked(true);
 
     item.SetItemName("ComPort");
     index = item.GetIntValue();

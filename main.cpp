@@ -75,7 +75,7 @@ static int runQtApplication(int argc, char *argv[])
 
     a.setStyle(QStyleFactory::create("Fusion"));
 
-    QFile stylesheet(":/style.qss");
+    QFile stylesheet(":/style-dark.qss");
     if (stylesheet.open(QIODevice::ReadOnly | QIODevice::Text)) {
         a.setStyleSheet(stylesheet.readAll());
         stylesheet.close();
