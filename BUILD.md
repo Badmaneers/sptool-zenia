@@ -1,4 +1,4 @@
-# Building SP Flash Tool v5.3-zenia from Source
+# Building SP Flash Tool v5.3.1-zenia from Source
 
 > For installation and usage, see [README.md](README.md).
 

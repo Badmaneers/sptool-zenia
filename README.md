@@ -1,8 +1,8 @@
-# SP Flash Tool for Linux v5.3-zenia
+# SP Flash Tool for Linux v5.3.1-zenia
 
 A Qt6-based flashing tool for MediaTek Android devices. Supports BROM mode, Download Agent mode, format, readback, memory test, firmware upgrade, and more.
 
-## What's New in 5.3-zenia
+## What's New in 5.3.1-zenia
 
 - Qt6 Linux port with dark mode and modern UI
 - BROM mode fix for Linux kernel 5.4+ (LD_PRELOAD shim)
@@ -56,8 +56,8 @@ sudo pacman -S qt6-base qt6-5compat libusb gmp openssl systemd-libs
 1. Extract the release archive:
 
 ```bash
-unzip flash_tool_linux_5.3-zenia.zip
-cd flash_tool_linux_v5.3-zenia
+unzip flash_tool_linux_5.3.1-zenia.zip
+cd flash_tool_linux_v5.3.1-zenia
 ```
 
 2. Install udev rules so the tool can access USB devices without root:
@@ -140,7 +140,7 @@ MT6573, MT6575, MT6577, MT6589, MT6572, MT6582, MT8135, MT6592, MT6571, MT8127, 
 ## File Structure
 
 ```
-flash_tool_linux_v5.3-zenia/
+flash_tool_linux_v5.3.1-zenia/
 ├── flash_tool              # Main binary
 ├── flash_tool.sh           # Launcher script (recommended)
 ├── 99-ttyacms.rules        # udev rules for USB device access

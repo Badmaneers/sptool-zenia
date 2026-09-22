@@ -34,12 +34,12 @@ static const bool           DEFAULT_ENABLE_LOGS = true;
 
 static const unsigned int  MAJOR_VER        = 5;
 static const unsigned int  MINOR_VER        = 3;
-static const unsigned int  BUILD_NUM        = 0;
+static const unsigned int  BUILD_NUM        = 1;
 static const unsigned int  BUILD_SN         = 0;
 //Note: REVISION_NUM is commit hash of the tool, should be HEX(0x...)
 static const unsigned int  REVISION_NUM     = 0x596975;
 static const char* const   BUILD_DATE       = __DATE__;
-static const char* const   VERSION_TAG      = "5.3-zenia";
+static const char* const   VERSION_TAG      = "5.3.1-zenia";
 static const char* const   COMMENTS         = "Qt6 Linux port with dark mode, BROM shim, and modern UI";
 
 static const char* const   APP_NAME         = "SP Flash Tool for Linux";
