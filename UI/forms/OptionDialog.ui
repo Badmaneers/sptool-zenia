@@ -1501,10 +1501,13 @@
                </property>
                <layout class="QGridLayout" name="gridLayout">
                 <item row="0" column="0">
-                 <widget class="QRadioButton" name="radioUART">
-                  <property name="text">
-                   <string>UART</string>
-                  </property>
+                  <widget class="QRadioButton" name="radioUART">
+                   <property name="text">
+                    <string>UART</string>
+                   </property>
+                   <property name="checked">
+                    <bool>true</bool>
+                   </property>
                  </widget>
                 </item>
                 <item row="1" column="0">
@@ -1563,13 +1566,13 @@
                </property>
                <layout class="QGridLayout" name="gridLayout_15">
                 <item row="0" column="0">
-                 <widget class="QRadioButton" name="radioUSB">
-                  <property name="text">
-                   <string>USB</string>
-                  </property>
-                  <property name="checked">
-                   <bool>true</bool>
-                  </property>
+                  <widget class="QRadioButton" name="radioUSB">
+                   <property name="text">
+                    <string>USB</string>
+                   </property>
+                   <property name="checked">
+                    <bool>false</bool>
+                   </property>
                  </widget>
                 </item>
                 <item row="1" column="0">
