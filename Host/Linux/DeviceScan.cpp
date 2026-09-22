@@ -10,6 +10,8 @@
 #include <errno.h>
 #include <netinet/in.h>
 #include <QElapsedTimer>
+#include <QDir>
+#include <QRegularExpression>
 
 #include "../../BootRom/brom.h"
 
@@ -275,8 +277,105 @@ bool DeviceScan::GetDeviceInfo(size_t ports_count,
     return false;
 }
 
+bool DeviceScan::ScanExistingDevices(size_t ports_count, char *portName, const char *preferComPort)
+{
+    QDir devDir("/dev");
+    QStringList ttyACM = devDir.entryList(QStringList() << "ttyACM*", QDir::System, QDir::Name);
+
+    for (const QString &dev : ttyACM)
+    {
+        std::string devPath = "/dev/" + dev.toStdString();
+        std::string ttyName = dev.toStdString();
+
+        // Find sysfs path: /sys/class/tty/ttyACMx/device -> symlink to USB device
+        std::string sysLink = "/sys/class/tty/" + ttyName + "/device";
+        char resolvedPath[4096] = {0};
+        ssize_t len = readlink(sysLink.c_str(), resolvedPath, sizeof(resolvedPath) - 1);
+        if (len <= 0)
+            continue;
+
+        // resolvedPath is e.g. /sys/devices/.../1-1.2/ttyACM0/device
+        // Go up to the USB device directory (contains idVendor/idProduct)
+        std::string sysDevDir(resolvedPath, len);
+
+        // Try reading VID/PID from this dir and parent dirs
+        char vidBuf[16] = {0};
+        char pidBuf[16] = {0};
+        std::string searchDir = sysDevDir;
+
+        for (int depth = 0; depth < 6; ++depth)
+        {
+            std::string vidPath = searchDir + "/idVendor";
+            std::string pidPath = searchDir + "/idProduct";
+
+            int fd = open(vidPath.c_str(), O_RDONLY);
+            if (fd >= 0)
+            {
+                ssize_t n = read(fd, vidBuf, sizeof(vidBuf) - 1);
+                close(fd);
+                if (n > 0) vidBuf[n] = '\0';
+                else continue;
+
+                fd = open(pidPath.c_str(), O_RDONLY);
+                if (fd >= 0)
+                {
+                    n = read(fd, pidBuf, sizeof(pidBuf) - 1);
+                    close(fd);
+                    if (n > 0) pidBuf[n] = '\0';
+                    else continue;
+
+                    USB_DEVICE_INFO devInfo;
+                    devInfo.vid = strtol(vidBuf, NULL, 16);
+                    devInfo.pid = strtol(pidBuf, NULL, 16);
+
+                    LOGI("existing device: %s VID=%04x PID=%04x\n",
+                         devPath.c_str(), devInfo.vid, devInfo.pid);
+
+                    if (VerifyDeviceInfo(ports_count, &devInfo))
+                    {
+                        // Check preferComPort if specified
+                        if (preferComPort)
+                        {
+                            std::string portPath = "/dev" + std::string(preferComPort);
+                            if (devPath.find(preferComPort) == std::string::npos &&
+                                devPath != portPath)
+                            {
+                                LOGI("skip non-preferred port: %s\n", devPath.c_str());
+                                break;
+                            }
+                        }
+
+                        snprintf(portName, UEVENT_BUFFER_SIZE + 5, "%s", devPath.c_str());
+                        if (WaitForDeviceReady(portName))
+                        {
+                            LOGI("existing device ready at %s\n", portName);
+                            return true;
+                        }
+                    }
+                    break;
+                }
+            }
+
+            // Go up one directory
+            size_t pos = searchDir.rfind('/');
+            if (pos == std::string::npos || pos == 0)
+                break;
+            searchDir = searchDir.substr(0, pos);
+        }
+    }
+
+    return false;
+}
+
 bool DeviceScan::FindDeviceUSBPort(size_t ports_count, char *portName, int* p_stop_flag, const int& d_time_out, const char *preferComPort)
 {
+    // First check if a matching device is already plugged in
+    if (ScanExistingDevices(ports_count, portName, preferComPort))
+    {
+        LOGI("found existing device, skipping uevent wait\n");
+        return true;
+    }
+
     hotplug_sock_ = init_hotplug_sock();
     if(hotplug_sock_ < 0)
     {

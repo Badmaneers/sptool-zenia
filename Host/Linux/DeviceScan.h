@@ -28,6 +28,7 @@ private:
 
     void GetDeviceID();
     bool USBPathMatch(const char *buf, const char *preferComPort) const;
+    bool ScanExistingDevices(size_t ports_count, char *portName, const char *preferComPort);
 
 private:
     DeviceScan(const DeviceScan &rhs);
