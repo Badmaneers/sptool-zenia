@@ -36,7 +36,7 @@ static const QString kUfsEmmcDefRegionStr = "USER";
 static const QString kDefaultFilePrefix = "ROM_";
 
 ReadBackWidget::ReadBackWidget(QTabWidget *parent, MainWindow *window) :
-    TabWidgetBase(3, tr("&Readback"), parent),
+    TabWidgetBase(4, tr("&Readback"), parent),
     ui_(new Ui::ReadBackWidget),
     main_window_(window),
     addr_dialog_(new ReadBackAddressDialog(this)),

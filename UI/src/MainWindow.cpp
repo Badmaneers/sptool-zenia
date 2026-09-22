@@ -11,6 +11,7 @@
 #include "WriteMemoryWidget.h"
 #include "SCIDownloadWidget.h"
 #include "CloneDownloadWidget.h"
+#include "PayloadWidget.h"
 #include "AboutDialog.h"
 #include "CheckUpdateDialog.h"
 #include "ProcessingDialog.h"
@@ -157,10 +158,12 @@ void MainWindow::CreateWidget()
     bromAdapter_widget = new BromAdapterWidget(ui->tabWidget, this);
     sciDownload_widget_ = new SCIDownloadWidget(ui->tabWidget, this);
     cloneDownload_wdiget_ = new CloneDownloadWidget(ui->tabWidget, this);
+    payload_widget = new PayloadWidget(ui->tabWidget, this);
 
     tab_widgets.push_back(welcome_widget);
     tab_widgets.push_back(format_widget);
     tab_widgets.push_back(download_widget);
+    tab_widgets.push_back(payload_widget);
     tab_widgets.push_back(readback_widget);
     tab_widgets.push_back(memtest_widget);
 

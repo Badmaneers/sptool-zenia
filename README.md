@@ -12,20 +12,22 @@ A Qt6-based flashing tool for MediaTek Android devices. Supports BROM mode, Down
 - Dark/Light theme toggle
 - GitHub Actions CI/CD workflow
 - Bundled xerces-c + ICU — no system install required
+- **Payload tab** — crash device to BROM using mtk_payload before flashing
 
 ## Requirements
 
 - Linux x86_64 (kernel 5.4+)
 - **Qt6 runtime libraries** (Qt6Core, Qt6Widgets, Qt6Gui, Qt6Network, Qt6Core5Compat)
+- **libusb** (runtime, for payload tool)
 
 ### Install dependencies
 
 ```bash
 # Ubuntu/Debian
-sudo apt install qt6-base-dev libqt6core5compat6
+sudo apt install qt6-base-dev libqt6core5compat6 libusb-1.0-0
 
 # Arch
-sudo pacman -S qt6-base qt6-5compat
+sudo pacman -S qt6-base qt6-5compat libusb
 ```
 
 ## Installation
@@ -69,6 +71,18 @@ sudo usermod -aG plugdev $USER
 
 Log out and back in for the group change to take effect.
 
+## Payload Tab (Crash to BROM)
+
+For locked or security-enabled devices, use the **Payload** tab before flashing:
+
+1. Connect the device via USB.
+2. Go to the **Payload** tab (next to Download).
+3. Select the payload type (or leave as Auto for Kamakiri2).
+4. Click **Run Payload** — the tool exploits the chip and crashes it into BROM mode.
+5. Once the status shows "Done — device in BROM, switch to Download tab", go to the **Download** tab and flash as normal.
+
+The payload tool auto-detects the connected MediaTek chip and resolves the correct exploit payload. Supported payload types: Kamakiri, Kamakiri2, Amonet, Hashimoto, Carbonara.
+
 ## Connecting a Device
 
 1. Power off the device completely.
@@ -84,6 +98,7 @@ For BROM mode (preloader/bootrom), the tool automatically detects the device whe
 |-------|----------|
 | `Could not find Qt platform plugin` | Install Qt6 runtime: `sudo apt install qt6-base-dev` |
 | `Connect BROM failed: STATUS_ERR` | Ensure device is powered off and connected via USB. Check udev rules are installed. |
+| `mtk_payload binary not found` | Ensure the `payload/` directory is bundled in the dist (rebuild with `./build.sh`). |
 | No COM ports listed | Install udev rules, add user to `plugdev` group, re-login. |
 | Permission denied on `/dev/ttyACM*` | Run `sudo chmod 666 /dev/ttyACM*` or reinstall udev rules. |
 | Dark theme looks wrong | Go to Options > Appearance and select your preferred theme. |
@@ -115,6 +130,9 @@ flash_tool_linux_v5.3-zenia/
 ├── usb_setting.xml         # USB device ID definitions
 ├── platform.xml            # Platform definitions
 ├── lib/                    # MTK libraries + BROM shim + xerces-c
+├── payload/                # mtk_payload tool + chip exploit binaries
+│   ├── mtk_payload         # BROM crash/exploit binary (libusb)
+│   └── payloads/           # Per-chip payload .bin files
 ├── flashtool.qhc           # Qt Assistant help collection
 └── flashtool.qch           # Qt Assistant help data
 ```

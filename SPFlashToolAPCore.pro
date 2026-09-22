@@ -227,6 +227,7 @@ SOURCES += \
     Setting/DRAMRepairSetting.cpp \
     UI/src/AsyncUARTComPortInfo.cpp \
     UI/src/fw.cpp \
+    UI/src/PayloadWidget.cpp \
     Cmd/FWCommand.cpp \
     Setting/FWSetting.cpp \
     Cmd/ICommand.cpp \
@@ -460,6 +461,7 @@ HEADERS += \
     Setting/FWSetting.h \
     Cmd/FWCommand.h \
     UI/src/fw.h \
+    UI/src/PayloadWidget.h \
     Cmd/UFSConfigCommand.h \
     Setting/UFSConfigSetting.h \
     Cmd/SetResetBootModeCommand.h \
@@ -508,7 +510,8 @@ FORMS += \
     UI/forms/TabWidget/CloneDownloadWidget.ui \
     UI/forms/EncryDialog.ui \
     UI/forms/UfsWidget.ui \
-    UI/forms/TabWidget/fw.ui
+    UI/forms/TabWidget/fw.ui \
+    UI/forms/TabWidget/PayloadWidget.ui
 
 win32:FORMS += UI/forms/UpdateDialog.ui \
     UI/forms/CheckUpdateDialog.ui

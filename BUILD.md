@@ -22,10 +22,22 @@ sudo pacman -S qt6-base qt6-5compat
 
 ```bash
 # Ubuntu/Debian
-sudo apt install build-essential g++ qmake6 patchelf zip
+sudo apt install build-essential g++ cmake qmake6 patchelf zip
 
 # Arch
-sudo pacman -S base-devel gcc qmake6 patchelf zip
+sudo pacman -S base-devel gcc cmake qmake6 patchelf zip
+```
+
+### mtk_payload Dependencies
+
+The bundled payload tool (BROM crash/exploit) requires CMake and libusb/GMP/OpenSSL:
+
+```bash
+# Ubuntu/Debian
+sudo apt install cmake libusb-1.0-0-dev libgmp-dev libssl-dev
+
+# Arch
+sudo pacman -S cmake libusb gmp openssl
 ```
 
 ### Xerces-C (XML parser)
@@ -48,8 +60,9 @@ This will:
 1. Run `qmake6` to generate the Makefile
 2. Compile the binary (`flash_tool`)
 3. Build the BROM shim (`libpatch_brom.so`)
-4. Stage all runtime libraries and data files into `dist/flash_tool_linux_<date>/`
-5. Package as a `.zip` (or `.tar.gz` if zip isn't installed)
+4. Build `mtk_payload` via CMake (if cmake + libusb/gmp/openssl are available)
+5. Stage all runtime libraries and data files into `dist/flash_tool_linux_<date>/`
+6. Package as a `.zip` (or `.tar.gz` if zip isn't installed)
 
 Output: `dist/flash_tool_linux_<date>.zip`
 
@@ -104,7 +117,16 @@ gcc -shared -fPIC -o build/libpatch_brom.so lib/patch_brom.c -ldl
 
 This shim intercepts `TIOCGSERIAL`/`TIOCSSERIAL` ioctls that kernel 5.4+ CDC ACM drivers reject, allowing BROM mode to work on modern kernels.
 
-### 4. Stage the Distribution
+### 4. Build mtk_payload (BROM Exploit Tool)
+
+```bash
+cmake -B build/mtk_payload -S mtk_payload -DCMAKE_BUILD_TYPE=Release
+cmake --build build/mtk_payload -j$(nproc)
+```
+
+This builds the standalone mtk_payload binary that the Payload tab invokes via QProcess.
+
+### 5. Stage the Distribution
 
 ```bash
 NAME="flash_tool_linux_$(date +%Y%m%d)"
@@ -144,6 +166,14 @@ On Linux kernel 5.4+, the CDC ACM USB serial driver returns `EOPNOTSUPP` for `TI
 
 The shim (`libpatch_brom.so`) is loaded via `LD_PRELOAD` by the launcher script, or automatically by the binary itself via self-reexec. It intercepts these ioctls on `/dev/ttyACM*` devices and returns fake success.
 
+### Payload Tool (`payload/mtk_payload`)
+
+A standalone CMake/C++20 binary built from `mtk_payload/` that exploits MediaTek chips to crash them into BROM mode. Used by the Payload tab via QProcess (separate process avoids libusb conflicts with the precompiled MTK USB stack).
+
+Key flags: `payload [--ptype ...] [--loader ...] [--crash] [--debugmode]`
+
+The binary locates its payloads directory relative to its own path (`payload/payloads/`).
+
 ### Self-Reexec (`main.cpp`)
 
 When `flash_tool` is run directly (not via `flash_tool.sh`), it checks at startup whether the BROM shim is loaded. If not, it sets `LD_PRELOAD` and re-executes itself. This ensures the shim is always active regardless of how the binary is launched.
@@ -171,3 +201,5 @@ The binary uses `$ORIGIN` and `$ORIGIN/lib` as RPATH with `--disable-new-dtags` 
 | `libxerces-c not found` | Install `libxerces-c-dev` |
 | `libpatch_brom.so build failed` | Ensure `gcc` is installed (build-essential) |
 | `unresolved dependencies` after build | Check `ldd build/flash_tool` for missing libs, install them |
+| `mtk_payload cmake configure failed` | Install `cmake libusb-1.0-0-dev libgmp-dev libssl-dev` |
+| `mtk_payload binary not produced` | Check cmake output for errors; ensure C++20 compiler is available |

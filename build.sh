@@ -115,6 +115,28 @@ build() {
         "$SRC_DIR/lib/patch_brom.c" -ldl || {
         echo "warning: libpatch_brom.so build failed" >&2
     }
+
+    echo "== building mtk_payload =="
+    if command -v cmake >/dev/null 2>&1; then
+        cmake -B "$BUILD_DIR/mtk_payload" -S "$SRC_DIR/mtk_payload" \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INSTALL_RPATH='$ORIGIN' \
+            -DCMAKE_BUILD_WITH_INSTALL_RPATH=ON 2>/dev/null || {
+            echo "warning: mtk_payload cmake configure failed (missing libusb/gmp/openssl?)" >&2
+        }
+        if [ -f "$BUILD_DIR/mtk_payload/Makefile" ] || [ -f "$BUILD_DIR/mtk_payload/CMakeCache.txt" ]; then
+            cmake --build "$BUILD_DIR/mtk_payload" -j"$JOBS" 2>/dev/null || {
+                echo "warning: mtk_payload build failed" >&2
+            }
+        fi
+        if [ -x "$BUILD_DIR/mtk_payload/mtk_payload" ]; then
+            echo "== mtk_payload OK =="
+        else
+            echo "warning: mtk_payload binary not produced" >&2
+        fi
+    else
+        echo "warning: cmake not found, skipping mtk_payload build" >&2
+    fi
 }
 
 if [ "$DO_CLEAN" = "1" ]; then
@@ -161,6 +183,17 @@ cp /usr/lib/x86_64-linux-gnu/libicui18n.so.*      "$STAGE/lib/" 2>/dev/null || t
 cp /usr/lib/x86_64-linux-gnu/libicuio.so.*        "$STAGE/lib/" 2>/dev/null || true
 cp /usr/lib/x86_64-linux-gnu/libicutu.so.*        "$STAGE/lib/" 2>/dev/null || true
 (cd "$STAGE/lib" && ln -sf libxerces-c-3.2.so libxerces-c.so.3 && ln -sf libxerces-c.so.3 libxerces-c.so) 2>/dev/null || true
+
+echo "== bundling mtk_payload =="
+if [ -x "$BUILD_DIR/mtk_payload/mtk_payload" ]; then
+    mkdir -p "$STAGE/payload/payloads"
+    cp "$BUILD_DIR/mtk_payload/mtk_payload" "$STAGE/payload/"
+    chmod +x "$STAGE/payload/mtk_payload"
+    cp "$SRC_DIR"/mtk_payload/payloads/*.bin "$STAGE/payload/payloads/" 2>/dev/null || true
+    echo "=== mtk_payload binary + payloads bundled ==="
+else
+    echo "warning: mtk_payload binary not found, skipping payload bundling" >&2
+fi
 
 for pat in '*.xml' '*.xsd' '*.ini' '*.bin' '*.json' '*.rules' '*.qhc' '*.qch' '*.sh' '*.conf'; do
     cp "$SRC_DIR"/lib/$pat "$STAGE/" 2>/dev/null || true

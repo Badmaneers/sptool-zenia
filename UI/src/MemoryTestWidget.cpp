@@ -10,7 +10,7 @@
 #include <QRegularExpressionValidator>
 
 MemoryTestWidget::MemoryTestWidget(QTabWidget *parent, MainWindow *window) :
-    TabWidgetBase(4, tr("Memory&Test"), parent),
+    TabWidgetBase(5, tr("Memory&Test"), parent),
     main_window_(window),
     ui_(new Ui::MemoryTestWidget),
     m_dram_repair_status_code(STATUS_DRAM_REPAIR_COMPLETE)

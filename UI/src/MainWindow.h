@@ -82,6 +82,7 @@ class SDMMCWidget;
 class UfsWidget;
 class SCIDownloadWidget;
 class CloneDownloadWidget;
+class PayloadWidget;
 class EncryDialog;
 
 typedef enum
@@ -312,6 +313,7 @@ private:
     BromAdapterWidget* bromAdapter_widget;
     SCIDownloadWidget* sciDownload_widget_;
     CloneDownloadWidget* cloneDownload_wdiget_;
+    PayloadWidget* payload_widget;
     std::list<TabWidgetBase*> tab_widgets;
 
     ChipInfoWidget* info_widget_;
