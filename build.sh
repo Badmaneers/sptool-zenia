@@ -153,6 +153,15 @@ cp "$SRC_DIR"/lib/libsla_challenge.so* "$STAGE/lib/" 2>/dev/null || true
 
 [ -f "$BUILD_DIR/libpatch_brom.so" ] && cp "$BUILD_DIR/libpatch_brom.so" "$STAGE/lib/"
 
+echo "== bundling xerces-c + ICU =="
+cp /usr/lib/x86_64-linux-gnu/libxerces-c-3.2.so "$STAGE/lib/" 2>/dev/null || true
+cp /usr/lib/x86_64-linux-gnu/libicuuc.so.*        "$STAGE/lib/" 2>/dev/null || true
+cp /usr/lib/x86_64-linux-gnu/libicudata.so.*      "$STAGE/lib/" 2>/dev/null || true
+cp /usr/lib/x86_64-linux-gnu/libicui18n.so.*      "$STAGE/lib/" 2>/dev/null || true
+cp /usr/lib/x86_64-linux-gnu/libicuio.so.*        "$STAGE/lib/" 2>/dev/null || true
+cp /usr/lib/x86_64-linux-gnu/libicutu.so.*        "$STAGE/lib/" 2>/dev/null || true
+(cd "$STAGE/lib" && ln -sf libxerces-c-3.2.so libxerces-c.so.3 && ln -sf libxerces-c.so.3 libxerces-c.so) 2>/dev/null || true
+
 for pat in '*.xml' '*.xsd' '*.ini' '*.bin' '*.json' '*.rules' '*.qhc' '*.qch' '*.sh' '*.conf'; do
     cp "$SRC_DIR"/lib/$pat "$STAGE/" 2>/dev/null || true
 done

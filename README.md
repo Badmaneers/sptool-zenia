@@ -6,25 +6,26 @@ A Qt6-based flashing tool for MediaTek Android devices. Supports BROM mode, Down
 
 - Qt6 Linux port with dark mode and modern UI
 - BROM mode fix for Linux kernel 5.4+ (LD_PRELOAD shim)
+- BROM mode fix for Linux kernel 7.0+ (broadened EOPNOTSUPP interception)
 - UART as default connection type
 - Native file dialogs
 - Dark/Light theme toggle
 - GitHub Actions CI/CD workflow
+- Bundled xerces-c + ICU — no system install required
 
 ## Requirements
 
 - Linux x86_64 (kernel 5.4+)
 - **Qt6 runtime libraries** (Qt6Core, Qt6Widgets, Qt6Gui, Qt6Network, Qt6Core5Compat)
-- Xerces-C XML library
 
 ### Install dependencies
 
 ```bash
 # Ubuntu/Debian
-sudo apt install qt6-base-dev libqt6core5compat6 libxerces-c-dev
+sudo apt install qt6-base-dev libqt6core5compat6
 
 # Arch
-sudo pacman -S qt6-base qt6-5compat xerces-c
+sudo pacman -S qt6-base qt6-5compat
 ```
 
 ## Installation
@@ -82,7 +83,6 @@ For BROM mode (preloader/bootrom), the tool automatically detects the device whe
 | Issue | Solution |
 |-------|----------|
 | `Could not find Qt platform plugin` | Install Qt6 runtime: `sudo apt install qt6-base-dev` |
-| `libxerces-c.so.3: cannot open shared object` | Install xerces-c: `sudo apt install libxerces-c-dev` |
 | `Connect BROM failed: STATUS_ERR` | Ensure device is powered off and connected via USB. Check udev rules are installed. |
 | No COM ports listed | Install udev rules, add user to `plugdev` group, re-login. |
 | Permission denied on `/dev/ttyACM*` | Run `sudo chmod 666 /dev/ttyACM*` or reinstall udev rules. |
@@ -114,7 +114,7 @@ flash_tool_linux_v5.3-zenia/
 ├── option.ini              # Saved settings
 ├── usb_setting.xml         # USB device ID definitions
 ├── platform.xml            # Platform definitions
-├── lib/                    # MTK libraries + BROM shim
+├── lib/                    # MTK libraries + BROM shim + xerces-c
 ├── flashtool.qhc           # Qt Assistant help collection
 └── flashtool.qch           # Qt Assistant help data
 ```
