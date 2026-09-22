@@ -144,7 +144,7 @@ void PayloadWidget::startPayload()
     connect(process_, SIGNAL(readyReadStandardOutput()), this, SLOT(processReadyReadStdOut()));
     connect(process_, SIGNAL(readyReadStandardError()), this, SLOT(processReadyReadStdErr()));
     connect(process_, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(processFinished(int,QProcess::ExitStatus)));
-    connect(process_, SIGNAL(error(QProcess::ProcessError)), this, SLOT(processError(QProcess::ProcessError)));
+    connect(process_, SIGNAL(errorOccurred(QProcess::ProcessError)), this, SLOT(processError(QProcess::ProcessError)));
 
     ui_->logOutput->clear();
 
@@ -175,12 +175,20 @@ void PayloadWidget::startPayload()
 
 void PayloadWidget::stopPayload()
 {
-    if (process_ && process_->state() == QProcess::Running) {
+    if (!process_)
+        return;
+    if (process_->state() == QProcess::Running) {
         process_->terminate();
         process_->waitForFinished(3000);
-        if (process_->state() == QProcess::Running)
-            process_->kill();
     }
+    if (process_ && process_->state() != QProcess::NotRunning)
+        process_->kill();
+    if (process_) {
+        process_->deleteLater();
+        process_ = NULL;
+    }
+    setRunning(false);
+    ui_->labelStatus->setText(tr("Stopped"));
 }
 
 void PayloadWidget::processReadyReadStdOut()
@@ -206,6 +214,11 @@ void PayloadWidget::processReadyReadStdErr()
 void PayloadWidget::processFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
     Q_UNUSED(exitCode);
+    Q_UNUSED(exitStatus);
+
+    if (!process_)
+        return;
+
     setRunning(false);
 
     if (exitStatus == QProcess::NormalExit && exitCode == 0)
@@ -213,14 +226,15 @@ void PayloadWidget::processFinished(int exitCode, QProcess::ExitStatus exitStatu
     else
         ui_->labelStatus->setText(tr("Failed (exit code %1)").arg(exitCode));
 
-    if (process_) {
-        process_->deleteLater();
-        process_ = NULL;
-    }
+    process_->deleteLater();
+    process_ = NULL;
 }
 
 void PayloadWidget::processError(QProcess::ProcessError error)
 {
+    if (!process_)
+        return;
+
     setRunning(false);
     switch (error) {
         case QProcess::FailedToStart:
@@ -242,8 +256,6 @@ void PayloadWidget::processError(QProcess::ProcessError error)
     }
 
     ui_->labelStatus->setText(tr("Error"));
-    if (process_) {
-        process_->deleteLater();
-        process_ = NULL;
-    }
+    process_->deleteLater();
+    process_ = NULL;
 }
