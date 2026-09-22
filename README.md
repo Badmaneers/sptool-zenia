@@ -18,16 +18,37 @@ A Qt6-based flashing tool for MediaTek Android devices. Supports BROM mode, Down
 
 - Linux x86_64 (kernel 5.4+)
 - **Qt6 runtime libraries** (Qt6Core, Qt6Widgets, Qt6Gui, Qt6Network, Qt6Core5Compat)
-- **libusb** (runtime, for payload tool)
 
-### Install dependencies
+### Payload Tool Dependencies
+
+The bundled payload tool (`payload/mtk_payload`) requires these system libraries:
+
+| Library | Ubuntu/Debian | Arch |
+|---------|---------------|------|
+| libusb-1.0 | `libusb-1.0-0` | `libusb` |
+| libgmp | `libgmp10` | `gmp` |
+| libcrypto/libssl | `libssl3t64` | `openssl` |
+| libudev | `libudev1` | `systemd-libs` |
+
+Most are pre-installed on desktop systems. Install them if missing:
 
 ```bash
 # Ubuntu/Debian
-sudo apt install qt6-base-dev libqt6core5compat6 libusb-1.0-0
+sudo apt install libusb-1.0-0 libgmp10 libssl3t64 libudev1
 
 # Arch
-sudo pacman -S qt6-base qt6-5compat libusb
+sudo pacman -S libusb gmp openssl systemd-libs
+```
+
+### Full Install (all dependencies)
+
+```bash
+# Ubuntu/Debian
+sudo apt install qt6-base-dev libqt6core5compat6 \
+    libusb-1.0-0 libgmp10 libssl3t64 libudev1
+
+# Arch
+sudo pacman -S qt6-base qt6-5compat libusb gmp openssl systemd-libs
 ```
 
 ## Installation
