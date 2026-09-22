@@ -434,6 +434,10 @@ QStatusBar QLabel {
 }
 
 /* ── Tool Box (left panel) ──────────────────────────────────── */
+QToolBox {
+    qproperty-iconSize: 16px 16px;
+}
+
 QToolBox::tab {
     background: #e8e8e8;
     border: 1px solid #d0d0d0;
@@ -441,6 +445,7 @@ QToolBox::tab {
     padding: 8px 12px;
     font-weight: 600;
     color: #555555;
+    min-height: 24px;
 }
 
 QToolBox::tab:selected {
