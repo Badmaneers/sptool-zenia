@@ -1,5 +1,5 @@
 {
-    "Version": "5.3-zenia",
+    "Version": "5.3.1-zenia",
 
     "New-Features/Enhancements": [
         "Qt6 Linux port with dark mode and modern UI",
@@ -7,7 +7,8 @@
         "UART as default connection type",
         "Native file dialogs",
         "Dark/Light theme toggle",
-        "GitHub Actions CI/CD workflow"
+        "GitHub Actions CI/CD workflow",
+        "Payload tab for BROM crash-to-BROM via mtk_payload"
     ],
 
     "Bug-Fixed": [
@@ -16,7 +17,9 @@
         "Fix buffer overflows and resource leaks",
         "Fix Qt6 tab removal and translator lifetime bugs",
         "Fix hardcoded colors breaking dark mode",
-        "Fix checkbox/radio indicator styling in dark mode"
+        "Fix checkbox/radio indicator styling in dark mode",
+        "Fix PayloadWidget stop button crash on QProcess cleanup",
+        "Fix Qt6 errorOccurred signal connection"
     ],
 
     "Limitations": {
